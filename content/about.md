@@ -7,7 +7,7 @@ url: "/about/"
 hidemeta: true
 ---
 ### A brief introduction  
-I'm Angad. I'm currently a student and have been interested in computer science for as long as I can remember. I've started programming by the time I was six years old and have been doing it since. Right now, I'm focusing on publishing open-source software and building my portfolio.  
+I'm Angad Behl. I'm currently a student and have been interested in computer science for as long as I can remember. I've started programming by the time I was six years old and have been doing it since. Right now, I'm focusing on publishing open-source software and building my portfolio.  
 ### Interests  
 Programming is definitely one of my interests. When I graduate, I hope to make a living from (ethical) software development. Since ~2023, I've been self-hosting a lot of services using Docker on a 2011 Dell Vostro 460 and a Pi 4. I also love skiing and wish I could do it more often.  
 ### Programming  

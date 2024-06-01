@@ -1,11 +1,11 @@
 baseURL: 'https://angad.me/'
 languageCode: en-us
 # This title is used as the website title (navbar and meta title)
-title: Angad
+title: Angad Behl
 theme: PaperMod
 
 params:
-  title: Hi! I'm Angad
+  title: Hi, I'm Angad!
   description: "I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software. I've been known online as slashtechno as well."
   # Home info mode
   # homeInfoParams:
@@ -15,6 +15,7 @@ params:
   analytics:
     goatcounter:
       Code: "sudo"
+      Src: "/count.js"
   images: [logo.png]
   ShowFullTextinRSS: true # Show full text in RSS feed
   ShowRssButtonInSectionTermList: true # Show RSS button in section term list
@@ -23,9 +24,9 @@ params:
     # title: "Hi! I'm Angad!"
     subtitle: "This is my portfolio/blog, whatever you want to call it. I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software."
     buttons:
-      - name: Blog Posts
+      - name: Blog
         url: "/blog/"
-      - name: Who am I?
+      - name: About
         url: "/about/"
   socialIcons: # Show the respective social icon linked to the corresponding URL
     - name: github
@@ -47,11 +48,15 @@ outputs:
 
 menu:
   main:
-    - indentifier: github
+    - identifier: about
+      name: About
+      url: about/
+      weight: 3
+    - identifier: github
       name: Github
       url: https://github.com/slashtechno
       weight: 2
-    - indentifier: search
+    - identifier: search
       name: Search
       url: search/
       weight: 1
