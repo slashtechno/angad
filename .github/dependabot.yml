@@ -1,16 +1,16 @@
 # Basic set up for three package managers
 
 version: 2
-updates:
+# updates:
 
-  # Maintain dependencies for GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "monthly"
+#   # Maintain dependencies for GitHub Actions
+#   - package-ecosystem: "github-actions"
+#     directory: "/"
+#     schedule:
+#       interval: "monthly"
 
-  # Maintain Git submodules
-  - package-ecosystem: "gitsubmodule"
-    directory: "/"
-    schedule:
-      interval: "monthly"
+#   # Maintain Git submodules
+#   - package-ecosystem: "gitsubmodule"
+#     directory: "/"
+#     schedule:
+#       interval: "monthly"
