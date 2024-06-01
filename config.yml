@@ -1,0 +1,49 @@
+baseURL: 'https://slashtechno.com/'
+languageCode: en-us
+title: slashtechno
+theme: PaperMod
+
+params:
+  title: slashtechno
+  description: "This is my website."
+  # Home info mode
+  # homeInfoParams:
+  #   Title: "I am slashtechno."
+  #   Content: This is my website.
+  env: production # Enables enchanced SEO
+  images: [logo.png]
+  profileMode:
+    enabled: true
+    title: "I am slashtechno."
+    subtitle: "This is my website."
+    buttons:
+      - name: Blog Posts
+        url: "/blog/"
+      - name: Who am I?
+        url: "/about/"
+  socialIcons: # Show the respective social icon linked to the corresponding URL
+    - name: github
+      url: "https://github.com/slashtechno"
+    - name: mastodon 
+      url: "https://fosstodon.org/@slashtechno"
+  cover:
+    linkFullImages: true # Clicking a post's cover image opens the image in a new tab
+  # Other settings
+  ShowBreadcrumbs: true # Show the path to a page'
+  ShowReadingTime: true # Show the page's reading time
+  # ShowShareButtons: true # Show the share buttons
+  # ShowPostNavLinks: true # Show navigation links under a post
+outputs:
+    home:
+        - HTML
+        - JSON
+menu:
+  main:
+    - indentifier: github
+      name: Github
+      url: https://github.com/slashtechno
+      weight: 2
+    - indentifier: search
+      name: Search
+      url: search/
+      weight: 1
