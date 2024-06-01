@@ -1,45 +1,45 @@
-name: Deploy Hugo site to Pages
-'on':
-  push:
-    branches: [main]
-  workflow_dispatch:
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# name: Deploy Hugo site to Pages
+# 'on':
+#   push:
+#     branches: [main]
+#   workflow_dispatch:
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
 
-concurrency:
-  group: build-${{ github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: build-${{ github.ref }}
+#   cancel-in-progress: true
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          fetch-depth: 0
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: latest
-      - name: Build
-        run: hugo
-      # - run: ls public
-      # - run: readlink -f public
-      - run: cp -r ${{ GITHUB.WORKSPACE }}/.old-site ${{ GITHUB.WORKSPACE }}/public
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./public
-  deploy:
-    environment:
-      name: github-pages
-#       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           submodules: true
+#           fetch-depth: 0
+#       - name: Setup Hugo
+#         uses: peaceiris/actions-hugo@v2
+#         with:
+#           hugo-version: latest
+#       - name: Build
+#         run: hugo
+#       # - run: ls public
+#       # - run: readlink -f public
+#       - run: cp -r ${{ GITHUB.WORKSPACE }}/.old-site ${{ GITHUB.WORKSPACE }}/public
+#       - name: Upload artifact
+#         uses: actions/upload-pages-artifact@v2
+#         with:
+#           path: ./public
+#   deploy:
+#     environment:
+#       name: github-pages
+# #       url: ${{ steps.deployment.outputs.page_url }}
+#     runs-on: ubuntu-latest
+#     needs: build
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v2
