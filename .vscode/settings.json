@@ -7,8 +7,10 @@
         ".old-site": true,
     },
     "cSpell.words": [
+        "goatcounter",
         "hidemeta",
         "ShowFullTextinRSS",
         "Vostro"
-    ]
+    ],
+    "editor.wordWrap": "on"
 }

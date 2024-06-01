@@ -12,6 +12,9 @@ params:
   #   Title: "I am Angad!"
   #   Content: This is my website.
   env: production # Enables enhanced SEO
+  analytics:
+    goatcounter:
+      Code: "sudo"
   images: [logo.png]
   ShowFullTextinRSS: true # Show full text in RSS feed
   ShowRssButtonInSectionTermList: true # Show RSS button in section term list
