@@ -1,21 +1,14 @@
 ---
-title: "About"
-date: 2022-07-29T14:18:22-05:00
+title: "A little about me"
+date: 2024-05-31
 draft: false
 url: "/about/"
-description: "About me, slashtechno"
-params:
-    description: "About me, slashtechno"
-    title: "About"
+# hidemeta should hide stuff like the date
 hidemeta: true
 ---
-### I am slashtechno.  
-I am a programmer. I started programming at a young age, and when I created my Github account, my interest in programming skyrocketed. Currently, many of my programs aim to increase quality of life by simplifying tasks. 
-Above all else, I enjoy tinkering with software (and sometimes hardware.) Whether it be Linux, Windows, networking, or something else entirely, the possibilites of what can be done with computers are endless.
-
-**Don't be evil.**
- 
-<!-- The first program I published on Github was [PiStaticIp](https://github.com/slashtechno/PiStaticIP). I developed PiStaticIp to make it easier to set a static IP address. My home router at this time could not successfully set a static IP for my Raspberry Pi. I learned a static IP could be forced on the client by adding one line to `/etc/dhcpcd.conf`.  
-In order to know what line to append to `/etc/dhcpcd.conf`, some information such as the subnet mask, gateway IP, and client IP. To make setting a IP slightly easier, I made a short, rudimentary Python script. While there is much room for improvement, it was the first program I published to Github.  
-
-My trend of creating programs to make a task easier continues. One of my recent programs, [gobackup-github](https://github.com/slashtechno/gobackup-github)  is my first Go project which aims to automake the process of backing up Github repositories.   -->
+### A brief introduction  
+I'm Angad. I'm currently a student and have been interested in computer science for as long as I can remember. I've started programming by the time I was six years old and have been doing it since. Right now, I'm focusing on publishing open-source software and building my portfolio.  
+### Interests  
+Programming is definitely one of my interests. When I graduate, I hope to make a living from (ethical) software development. Since ~2023, I've been self-hosting a lot of services using Docker on a 2011 Dell Vostro 460 and a Pi 4. I also love skiing and wish I could do it more often.  
+#### Programming  
+As mentioned, I program. I've been using Python and enjoy it. However, I want to learn JavaScript (as well as HTML and CSS) so I can make full-stack apps. I also like working with APIs and have made a few projects that use them. I've also taken Harvard CS50’s [Introduction to Programming with Python](https://cs50.harvard.edu/python/2022/) through edX.  

@@ -1,21 +1,24 @@
-baseURL: 'https://slashtechno.com/'
+baseURL: 'https://angad.me/'
 languageCode: en-us
-title: slashtechno
+# This title is used as the website title (navbar and meta title)
+title: Angad
 theme: PaperMod
 
 params:
-  title: slashtechno
-  description: "This is my website."
+  title: Hi! I'm Angad
+  description: "I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software. I've been known online as slashtechno as well."
   # Home info mode
   # homeInfoParams:
-  #   Title: "I am slashtechno."
+  #   Title: "I am Angad!"
   #   Content: This is my website.
-  env: production # Enables enchanced SEO
+  env: production # Enables enhanced SEO
   images: [logo.png]
+  ShowFullTextinRSS: true # Show full text in RSS feed
+  ShowRssButtonInSectionTermList: true # Show RSS button in section term list
   profileMode:
     enabled: true
-    title: "I am slashtechno."
-    subtitle: "This is my website."
+    # title: "Hi! I'm Angad!"
+    subtitle: "This is my portfolio/blog, whatever you want to call it. I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software."
     buttons:
       - name: Blog Posts
         url: "/blog/"
@@ -36,7 +39,9 @@ params:
 outputs:
     home:
         - HTML
-        - JSON
+        # - JSON
+        - RSS
+
 menu:
   main:
     - indentifier: github
