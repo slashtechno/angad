@@ -48,6 +48,11 @@ outputs:
 
 menu:
   main:
+  # Right to left
+    - identifier: Sponsor
+      name: Sponsor
+      url: https://github.com/sponsors/slashtechno
+      weight: 4
     - identifier: about
       name: About
       url: about/
