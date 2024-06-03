@@ -52,14 +52,18 @@ menu:
     - identifier: Sponsor
       name: Sponsor
       url: https://github.com/sponsors/slashtechno
-      weight: 4
-    - identifier: about
-      name: About
-      url: about/
-      weight: 3
+      weight: 5
     - identifier: github
       name: Github
       url: https://github.com/slashtechno
+      weight: 4
+    - identifier: fiverr
+      name: Fiverr
+      url: https://www.fiverr.com/angadbehl
+      weight: 3
+    - identifier: about
+      name: About
+      url: about/
       weight: 2
     - identifier: search
       name: Search
