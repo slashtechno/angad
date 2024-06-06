@@ -7,6 +7,9 @@
         ".old-site": true,
     },
     "cSpell.words": [
+        "asyncio",
+        "customizability",
+        "dateparser",
         "goatcounter",
         "hidemeta",
         "ShowFullTextinRSS",
