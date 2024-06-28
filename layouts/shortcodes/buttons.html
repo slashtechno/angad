@@ -1,0 +1,13 @@
+<!-- <div class="post-content"> -->
+<div>
+    <!-- <style>
+        .post-content a.button {
+            margin: 0; /* Adjust the value as needed */
+            box-shadow: none; /* Removes the box shadow */
+            /* Add more button styling here */
+        }
+    </style> -->
+    {{ range .Page.Params.buttonLinks }}
+        <a href="{{ .url }}" class="button" style="margin: 0;">{{ .text | title }}</a>
+    {{ end }}
+</div>

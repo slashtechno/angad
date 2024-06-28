@@ -1,8 +1,8 @@
 {
     "files.eol": "\n",
-    "search.exclude": {
-        "themes/*": true,
-    },
+    // "search.exclude": {
+    //     "themes/*": true,
+    // },
     "files.exclude": {
         ".old-site": true,
         "public/": true
