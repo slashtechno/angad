@@ -4,6 +4,7 @@ date: 2024-02-03
 # summary: 
 draft: false
 tags: ["self-hosting", "matrix"]
+categories: ["self-hosting"]
 summary: Setting up a (simple) bridge between Matrix and Signal
 ---  
 ## A short introduction  

@@ -9,6 +9,9 @@ buttonLinks:
 <!-- [0]: https://gohugo.io/content-management/sections/ -->
 
 I post on Mastodon more often than I do here. You can find me at [fosstodon.org/@slashtechno](https://fosstodon.org/@slashtechno).
-{{< buttons `[
+{{< rawhtml >}}
+<!-- {{< buttons `[
     {"text": "project-related posts", "url": "/categories/projects"}
-]` >}}
+]` >}} -->
+{{< categoryButtons >}}
+{{< /rawhtml >}}
