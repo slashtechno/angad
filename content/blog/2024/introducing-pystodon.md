@@ -6,6 +6,7 @@ description: Introducing Pystodon - a Mastodon bot with a focus on easy customiz
 date: 2024-06-06
 # summary:
 draft: false
+categories: ["projects"]
 tags: ["projects", "python", "mastodon"]
 ---
 ## The beginning

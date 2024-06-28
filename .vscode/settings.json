@@ -5,6 +5,7 @@
     },
     "files.exclude": {
         ".old-site": true,
+        "public/": true
     },
     "cSpell.words": [
         "asyncio",
@@ -13,7 +14,11 @@
         "goatcounter",
         "hidemeta",
         "ShowFullTextinRSS",
+        "showtoc",
         "Vostro"
     ],
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "explorer.autoRevealExclude": {
+        "themes/": true
+    }
 }

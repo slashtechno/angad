@@ -3,7 +3,8 @@ title: Introducing LLMail!
 date: 2024-06-09
 # summary: 
 draft: false
-tags: ["projects", "ai"]
+tags: ["ai", "email", "LLMs"]
+categories: ["projects"]
 description: Introducing LLMail - a project allowing you to interact with LLMs/AI via email
 ---
 ## Motivation
