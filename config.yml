@@ -8,6 +8,7 @@ params:
   title: Hi, I'm Angad!
   description: "I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software. I've been known online as slashtechno as well."
   showtoc: true
+  ShowCodeCopyButtons: true
   # Home info mode
   # homeInfoParams:
   #   Title: "I am Angad!"
@@ -36,11 +37,15 @@ params:
       url: "https://fosstodon.org/@slashtechno"
   cover:
     linkFullImages: true # Clicking a post's cover image opens the image in a new tab
+  editPost:
+    URL: "https://github.com/slashtechno/angad/blob/main/content"
+    Text: "Suggest Changes" # edit text
+    appendFilePath: true # to append file path to Edit link
   # Other settings
   ShowBreadcrumbs: true # Show the path to a page'
   ShowReadingTime: true # Show the page's reading time
   # ShowShareButtons: true # Show the share buttons
-  # ShowPostNavLinks: true # Show navigation links under a post
+  ShowPostNavLinks: true # Show navigation links under a post
 outputs:
     home:
         - HTML
