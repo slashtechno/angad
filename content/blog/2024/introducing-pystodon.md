@@ -1,8 +1,6 @@
 ---
 title: Introducing Pystodon!
 description: Introducing Pystodon - a Mastodon bot with a focus on easy customization.
-
-
 date: 2024-06-06
 lastmod: 2024-06-06
 # summary:

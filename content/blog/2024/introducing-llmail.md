@@ -4,7 +4,7 @@ date: 2024-06-09
 lastmod: 2024-06-09
 # summary: 
 draft: false
-tags: ["ai", "email"]
+tags: ["ai", "email", "python"]
 categories: ["projects"]
 description: Introducing LLMail - a project allowing you to interact with LLMs/AI via email
 ---
