@@ -23,3 +23,11 @@ Cross Blogger, from the beginning, supported Blogger (hence the name). However, 
 ### Post deletion  
 One feature that I wanted to implement was the ability to delete posts if they were deleted or unpublished in Blogger. However, this would lead to posts that existed before Cross Blogger started being used to also be deleted. Initially, I started implementing an external database, something I've recently done in Python but not in Go.  
 Fortunately, I realized how bad of an idea this would have been before I got too far. As the primary purpose is to produce Markdown files ready for a headless CMS, I had already implemented frontmatter support. By simply adding a key, called `managedByCrossBlogger` at the time of writing, posts created by Cross Blogger can easily be tracked. As this is in the file itself, no database is needed! Hugo also should ignore this meaning it should have no impact on the final site.  
+
+### Git integration  
+Often, a static site will be stored in a Git repository. This not only allows for version control, but also for contributions. Having the code be open source also means someone can reference your configuration. One of the most powerful parts, however, is continuous deployment.  
+Adding support for pushing to Git was relatively simple and works rather well. When a new post is written to the content directory, a commit can be made with the inherited Git settings and pushed the configured remote.  
+#### Deployment  
+<!-- Link to Wayback machine if the article no longer exists: https://web.archive.org/web/20240625155702/https://codebenchers.com/blog/gitea-actions-vercel -->
+Services like Vercel and Netlify can use the files from a Git repository to build a site, and deploy it seamlessly. Generally, it's extremely simple to automatically perform these actions when a commit is pushed if you link to a GitHub or GitLab repository.  
+However, in some cases, you may want to use a service like Gitea. At least when I tried this, Vercel did not offer automatic deployment from self-hosted Git repositories on the hobby plan. Vercel does, however, offer a CLI. After configuring Gitea Actions, I followed [this](https://codebenchers.com/blog/gitea-actions-vercel) guide to setup a workflow that automatically deploys to Vercel.  
