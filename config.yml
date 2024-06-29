@@ -74,3 +74,27 @@ taxonomies:
   tag: tags
   category: categories
   # series: series
+
+enableGitInfo: true
+
+# https://gohugo.io/getting-started/configuration/#configure-dates
+frontmatter:
+  date:
+  - date
+  - publishdate
+  - pubdate
+  - published
+  - lastmod
+  - modified
+  expiryDate:
+  - expirydate
+  - unpublishdate
+  lastmod:
+  - lastmod
+  - :git
+  - :fileModTime
+  publishDate:
+  - publishdate
+  - pubdate
+  - published
+  - date

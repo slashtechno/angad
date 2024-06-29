@@ -1,6 +1,6 @@
 ---
 title: Self-hosting a Matrix Server With Synapse
-date: 2023-09-02
+date: 2023-09-03
 # summary: 
 draft: false
 tags: ["self-hosting", "matrix"]

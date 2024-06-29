@@ -1,6 +1,7 @@
 ---
 title: Simple Signal-Matrix Bridge in Docker
 date: 2024-02-03
+lastmod: 2024-02-03
 # summary: 
 draft: false
 tags: ["self-hosting", "matrix"]

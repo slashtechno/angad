@@ -1,6 +1,7 @@
 ---
 title: "Hello World"
 date: 2022-07-28
+lastmod: 2022-08-01
 draft: true
 cover:
     # image: "random-image.jpg"

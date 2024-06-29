@@ -1,6 +1,7 @@
 ---
 title: Introducing LLMail!
 date: 2024-06-09
+lastmod: 2024-06-09
 # summary: 
 draft: false
 tags: ["ai", "email", "LLMs"]

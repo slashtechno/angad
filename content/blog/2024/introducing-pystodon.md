@@ -4,6 +4,7 @@ description: Introducing Pystodon - a Mastodon bot with a focus on easy customiz
 
 
 date: 2024-06-06
+lastmod: 2024-06-06
 # summary:
 draft: false
 categories: ["projects", "self-hosting"]
