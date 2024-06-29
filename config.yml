@@ -84,8 +84,8 @@ frontmatter:
   - publishdate
   - pubdate
   - published
-  - lastmod
-  - modified
+  # - lastmod
+  # - modified
   expiryDate:
   - expirydate
   - unpublishdate
