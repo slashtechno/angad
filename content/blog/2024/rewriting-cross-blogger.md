@@ -3,7 +3,7 @@ title: Rewriting Cross Blogger
 date: 2024-06-29
 lastmod: 2024-06-29
 draft: false
-tags: ["blogging", "ai", "python"]
+tags: ["blogging", "python"]
 categories: ["projects"]
 description: Rewriting Cross Blogger - a headless CMS for static sites
 ---
