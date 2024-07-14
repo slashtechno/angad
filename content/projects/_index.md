@@ -1,8 +1,7 @@
 ---
 title: Projects
-description: A collection of READMEs from various projects I've worked on
+description: A collection of READMEs from 
 cascade:
-  categories:
-    - "projects"
+  categories: ["projects"]
 ---
-You might want to checkout [projects](/categories/projects) as this section was mostly a test
+You might want to check out [projects](/categories/projects) as I generally write blog posts about my projects.

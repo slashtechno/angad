@@ -5,7 +5,7 @@ date: 2024-06-06
 lastmod: 2024-06-06
 # summary:
 draft: false
-categories: ["projects", "self-hosting"]
+categories: ["projects"]
 tags: ["projects", "python", "mastodon"]
 ---
 ## The beginning

@@ -30,6 +30,8 @@ params:
         url: "/blog/"
       - name: About
         url: "/about/"
+      - name: Projects
+        url: "/categories/projects/"
   socialIcons: # Show the respective social icon linked to the corresponding URL
     - name: github
       url: "https://github.com/slashtechno"

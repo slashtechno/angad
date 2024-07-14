@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+      "davidlday.languagetool-linter"
+    ],
+    "unwantedRecommendations": [
+        "streetsidesoftware.code-spell-checker"
+    ],
+  }

@@ -24,6 +24,8 @@
     },
     "languageToolLinter.external.url": "http://192.168.1.7:8010",
     "languageToolLinter.languageTool.ignoredWordsInWorkspace": [
-        "jsondb"
+        "categorybuttons",
+        "jsondb",
+        "rawhtml"
     ]
 }

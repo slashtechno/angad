@@ -9,16 +9,16 @@ cover:
 draft: false 
 tags: ["ai", "web-development"]
 aliases: ["clock"]
-categories: ["projects"]
+# categories: ["projects"]
 description: A simple, open-source clock that displays rhymes. Inspired by the Hack Club workshops Simple Clock and JsonDB, along with the Poem/1, an "AI rhyming clock".   
 ---
 ### TL;DR  
-My first full-stack app - a clock that displays LLM-generated rhymes/poems in addition to a normal analog clock. Check it out at [clock.angad.me](https://clock.angad.me).  
+I made my first full-stack app - a clock that displays LLM-generated rhymes/poems in addition to a normal analog clock. Check it out at [clock.angad.me](https://clock.angad.me).  
 ## Background
 I’ve wanted to learn full-stack development with JavaScript for a while. I kept putting it off, however, as I was unsure where to start. A friend of mine recommended I start with [Express.js](https://express.js). [Hack Club](https://hackclub.com/) also had a workshop regarding Express.js, [JsonDB](https://workshops.hackclub.com/json_db/). I decided to follow this along with the [Simple Clock](https://workshops.hackclub.com/simple_clock/) workshop to make a web-based clock that displays rhymes similar to the [Poem/1](https://www.kickstarter.com/projects/genmon/poem-1-the-ai-poetry-clock). For some background, the Poem/1 is a clock that displays the current time as an LLM-generated poem or short rhyme.  
 In the beginning, I imagined the project wouldn't be too complex as there only needs to be a single endpoint to request a rhyme. It turned out to be a slightly more complex project, but still rather straightforward.  
 ## The back end  
-Following the JsonDB workshop allowed me to learn about the general structure of an Express.js application. Upon completion of the tutorial, I added rate-limiting. One aspect of full-stack projects that I like is the ability call APIs from the back end so users are not required to provide their own API keys. This does, however, open up the door to abuse of an API endpoint. Whilst not a perfect solution, I implemented rate-limiting using [express-rate-limit](https://www.npmjs.com/package/express-rate-limit). After adding rate-limiting, I was able to implement calls to an OpenAI-compatible API to retrieve rhymes for a given time whilst minimizing the opportunity for abuse of the endpoint.
+Following the JsonDB workshop allowed me to learn about the general structure of an Express.js application. Upon completion of the tutorial, I added rate-limiting. One aspect of full-stack projects that I like is the ability call APIs from the back end, so users are not required to provide their own API keys. This does, however, open up the door to abuse of an API endpoint. Whilst not a perfect solution, I implemented rate-limiting using [express-rate-limit](https://www.npmjs.com/package/express-rate-limit). After adding rate-limiting, I was able to implement calls to an OpenAI-compatible API to retrieve rhymes for a given time whilst minimizing the opportunity for abuse of the endpoint.
 To actually generate the rhymes, I had to iterate upon the prompt I was using, but I eventually started seeing consistent, clear responses. The only thing left was to pass the responses to the client making this a full-stack project.
 ## The front end  
 The front end was rather simple to develop. The Simple Clock workshop showcased the process of creating a simple analog clock. It was a front-end only project, but it gave me the foundation needed for adding support for fetching rhymes.
