@@ -2,7 +2,10 @@
 title: Hello, time?
 date: 2024-07-13
 lastmod: 2024-07-13
-# TODO: Add post cover image
+cover:
+    image: "2024/hello-time-screenshot_time-08-48.png"
+    relative: true
+    alt: Screenshot showing the clock displaying the time and stating "Daybreak's glow, the hour does show, forty-eight minutes past eight."
 draft: true 
 tags: ["ai"]
 aliases: ["clock"]

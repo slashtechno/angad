@@ -36,7 +36,7 @@ params:
     - name: mastodon 
       url: "https://fosstodon.org/@slashtechno"
   cover:
-    linkFullImages: true # Clicking a post's cover image opens the image in a new tab
+    linkFullImages: false # Clicking a post's cover image opens the image in a new tab
   editPost:
     URL: "https://github.com/slashtechno/angad/blob/main/content"
     Text: "Suggest Changes" # edit text
