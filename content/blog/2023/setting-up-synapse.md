@@ -3,7 +3,7 @@ title: Self-hosting a Matrix Server With Synapse
 date: 2023-09-03
 # summary: 
 draft: false
-tags: ["self-hosting", "matrix"]
+tags: ["matrix"]
 categories: ["self-hosting"]
 summary: Running Synapse in Docker to self-host a Matrix instance 
 ---  
