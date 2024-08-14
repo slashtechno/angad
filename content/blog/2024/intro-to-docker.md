@@ -111,6 +111,7 @@ Using `docker run` can get tedious. For example, if you have multiple containers
 Note that `docker-compose` has effectively been superseded by `docker compose`.  
 ### Running a desktop environment in Docker  
 [LinuxServer](https://www.linuxserver.io/) is a group you may come across when self-hosting. They provide Docker images for a variety of services. In this example, we'll be using their [Webtop](https://github.com/linuxserver/docker-webtop) image. In some cases, you can clone the repository and run `docker-compose up`. However, it can be easier to just download the `docker-compose.yml` in its own directory. Docker will use the directory name to name containers, which is why I try to keep Compose files in a directory dedicated to the service or the cloned repository.  
+Webtop is a project that provides a web interface for a desktop environment. It uses KasmVNC which allows for remote desktop access through the browser. The latency has been quite good in my experience and audio works as well. Some other nice features include file-transfer, clipboard sharing, and multiple displays. If you just want a specific application, LinuxServer also has KasmVNC images for apps like [Firefox](https://fleet.linuxserver.io/image?name=linuxserver/firefox). 
 #### Create and navigate to a directory for the Webtop service  
 ```sh
 mkdir webtop
@@ -118,30 +119,44 @@ cd webtop
 ```
 #### Create the `docker-compose.yml` file  
 The `linxuserver/webtop` image doesn't have a `docker-compose.yml` file. It does, however, have example contents of what the file should look like in the README. I've edited the example slightly. Refer to the repository for the more, possibly updated, information.  
-```yml
----
+```yaml
 services:
   webtop:
-    image: lscr.io/linuxserver/webtop:latest
+    # Use the Ubuntu Webtop image with the MATE desktop environment
+    image: lscr.io/linuxserver/webtop:ubuntu-mate	
+    # The name of the container
     container_name: webtop
-    security_opt:
     environment:
+      # PUID and PGID are the user and group IDs of the user running the container
+      # These help with file permissions
+      # You can find these by running `id` in the terminal or by running `id -u` and `id -g`
       - PUID=1000
       - PGID=1000
+      # TZ is the timezone 
       - TZ=Etc/UTC
-      - TITLE=Webtop #optional
+      # TITLE (optional) is the title of the web interface
+      - TITLE=Webtop
+      # Set HTTP authentication (optional)
+      - CUSTOM_USER=user
+      - CUSTOM_PASS=password   
     volumes:
-      - /path/to/data:/config
-      - /var/run/docker.sock:/var/run/docker.sock #optional
+      # Mount /config (set as the home directory) to the `home` in the current directory 
+      - ./home:/config
+      # Optionally, allow for Docker in Docker by sharing the Docker socket
+      # The Webtop image has the Docker binary. If you're running an image that doesn't, install Docker in the container first.
+      - /var/run/docker.sock:/var/run/docker.sock 
     ports:
-      # Port 3000 is the web interface
-      # Port 3001 is the VNC interface
+      # Port 3000 is the web interface (kasmVNC)
+      # Port 3001 is the  web interface (kasmVNC) with HTTPS
       - 3000:3000
       - 3001:3001
-    devices:
+    # devices:
       # This optional mount should help with hardware acceleration (host should be Linux)
-      - /dev/dri:/dev/dri
-    # The README mentions that this helps with preventing web browsers from crashing
+      # - /dev/dri:/dev/dri
+    # The README mentions that this helps prevent web browsers from crashing
     shm_size: "1gb"
+    # Restart the container unless stopped manually
     restart: unless-stopped
 ```
+#### Running the Docker Compose file
+Run `docker compose up -d` in the same directory as the `docker-compose.yml` file. To run it in the foreground, remove the `-d`. To remove the container, run `docker compose down`.
