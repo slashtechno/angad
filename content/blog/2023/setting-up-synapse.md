@@ -3,8 +3,8 @@ title: Self-hosting a Matrix Server With Synapse
 date: 2023-09-03
 # summary: 
 draft: false
-tags: ["matrix"]
-categories: ["self-hosting"]
+tags: ["matrix", "self-hosting"]
+categories: ["guides"]
 summary: Running Synapse in Docker to self-host a Matrix instance 
 ---  
 Matrix is a versatile protocol for communication. Similar to ActivityPub, which Mastodon uses, Matrix supports federation. Thus, by self-hosting, you're using your own server whilst also being able to use your own domain.  

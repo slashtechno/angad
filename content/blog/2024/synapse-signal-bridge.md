@@ -4,8 +4,8 @@ date: 2024-02-03
 lastmod: 2024-02-03
 # summary: 
 draft: false
-tags: ["matrix"]
-categories: ["self-hosting"]
+tags: ["matrix", "self-hosting"]
+categories: ["guides"]
 summary: Setting up a (simple) bridge between Matrix and Signal
 ---  
 ## A short introduction  
