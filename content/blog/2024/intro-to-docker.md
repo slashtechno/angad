@@ -5,6 +5,7 @@ lastmod: 2024-08-14
 draft: true
 tags: ["self-hosting"]
 categories: ["guides"]
+# summary: Learn Docker in a way that should prevent unnecessary Stack Overflow visits
 description: An introduction to Docker and Docker Compose
 ---
 
@@ -51,7 +52,7 @@ ossyNMMMNyMMhsssssssssssssshmmmhssssssso
 ## Running Caddy (a web server) in Docker
 By default, when you delete a container, all data is lost. To persist data, you can use volumes! Technically, what we're doing here is a [bind-mount](https://docs.docker.com/engine/storage/bind-mounts/), not really a [volume](https://docs.docker.com/engine/storage/volumes/). In some cases, you might want to use a volume. In addition, the `--mount` flag is preferred over `-v` as it's more explicit. However, for simplicity, we'll use `-v`.
 ### Creating an index.html file
-```
+```sh
 # Create a directory for the files
 mkdir caddy-website
 cd caddy-website
@@ -73,46 +74,34 @@ You now should be able to access the website at [`http://localhost:2048`](http:/
 #### Keep in mind:  
 We're running in the background with `-d`. However, this doesn't mean the container will restart on boot, failure, or when Docker restarts. To have the container restart, add `--restart unless-stopped`. There are other [restart policies](https://docs.docker.com/engine/containers/start-containers-automatically/) as well, but `unless-stopped` will probably be the one you use most.  
 Also, since we're running in the background, you won't see any output. To see the logs, run `docker logs caddy`. Running `docker logs -f caddy` will _follow_ the logs, allowing you to see new logs as they're generated.
-##### Controlling the container  
+#### Controlling the container  
 Since we're running the container in the background, you might want to stop it. To stop the container, run `docker stop caddy`. To start it again, run `docker start caddy`. To remove the container, run `docker rm caddy`.  
 
 ## Images  
-Now's probably a good time to talk about images. A Docker image is made up of layers. Each layer is a change to the filesystem. In past examples, we've been using images made by others. However, you can create your own images. This is done with a `Dockerfile`. Here's the project structure for [gobackup-github](https://github.com/slashtechno/gobackup-github), a Go project that I made to backup GitHub repositories:
-```plaintext
-.
-├── Dockerfile
-├── LICENSE
-├── README.md
-├── cassette.tape
-├── cmd
-│   ├── backup.go
-│   ├── continuous.go
-│   └── root.go
-├── config.example.yaml
-├── config.yaml
-├── go.mod
-├── go.sum
-├── internal
-│   └── config.go
-├── main.go
-├── out.gif
-└── pkg
-    └── utils
-        └── utils.go
-``` 
-You can see the `Dockerfile` in the root of the project. Here's the `Dockerfile`:
+Now's probably a good time to talk about images. A Docker image is made up of layers. Each layer is a change to the filesystem. In past examples, we've been using images made by others. However, you can create your own images. This is done with a `Dockerfile`.
+### Creating a Dockerfile
+Create a file called `Dockerfile` with the following contents:  
 ```Dockerfile
-FROM golang:1.22
-WORKDIR /app
-COPY . .
-RUN go install
-ENTRYPOINT ["gobackup-github", "--config", "/config.yaml", "backup", "--output", "/backups"]
+FROM alpine:latest
+ENTRYPOINT ["echo"]
 ```
-### Explanation:
-* `FROM golang:1.22`: Use the `golang:1.22` image as the base image
-* `WORKDIR /app`: Set the working directory to `/app`
-* `COPY . .`: Copy the current directory to `/app`
-* `RUN go install`: Install the Go project
-* `ENTRYPOINT ["gobackup-github", "--config", "/config.yaml", "backup", "--output", "/backups"]`: Run `gobackup-github` with the specified arguments
-    * The stuff after the image name when running the container is appended to the `ENTRYPOINT`
-    * There's also `CMD` which is overridden by the stuff after the image name when running the container  
+Alternatively, you can run the following commands to do the same thing:  
+```sh
+echo "FROM alpine:latest" >> Dockerfile
+echo 'ENTRYPOINT ["echo"]' >> Dockerfile
+```
+#### Explanation:
+* `FROM alpine:latest`: Use the `alpine:latest` image as the base image
+    * Alpine is a lightweight Linux distribution often used in containers
+* `ENTRYPOINT ["echo"]`: Set the entrypoint to `echo`
+    * This means that when the container starts, it will run `echo` with any arguments passed to the container
+### Building the image
+Run `docker build -t echo .` in the same directory as the `Dockerfile`. This will build the image with the tag `echo`.  
+* To build the image with a different tag, run `docker build -t <tag> .`
+    * In some cases, you would want the registry to be included in the tag. For example, `docker build -t ghcr.io/username/echo .` for the GitHub Container Registry
+    * If, for whatever reason, the Dockerfile is not, in fact, called `Dockerfile`, you can specify the file with `docker build -t echo -f <filename> .`
+### Running the image  
+Run `docker run --rm echo Hello, Docker!`.  
+* `--rm`: Remove the container when it stops
+* `echo`: The image to run
+* `Hello, Docker!`: The argument to pass to `echo`
