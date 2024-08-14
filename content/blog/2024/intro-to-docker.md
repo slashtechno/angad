@@ -10,7 +10,7 @@ description: An introduction to Docker and Docker Compose
 ---
 
 ## What’s Docker?
-Docker is a tool for containerizing software. In _some_ cases, it can replace a VM. Each _container_ has it’s own filesystem. However, core system components are shared. **The container uses the host’s kernel.**
+Docker is a tool for containerizing software. In _some_ cases, it can replace a VM. Each _container_ has its own file system. However, core system components are shared. **The container uses the host’s kernel.**
 ### Speed! ⚡ 
 Due to the shared kernel, containers can run extremely fast. Imagine setting up an Ubuntu Server VM. Most would not consider the startup time insignificant. Now, try running a Docker Container.
 
@@ -20,7 +20,7 @@ A quick note, if you’re on Linux, you may have to use `sudo`.
 ### Explanation:
 * `docker run`: Run a container
 * `-it`: Allows interactive usage with the TTY
-  * Combination of `-i`  and `-t`
+  * Combination of `-i` and `-t`
 * `--rm`: Delete container when it stops
 * `bash`: Execute `bash` in the container in order to run commands
 ### Usage:
@@ -78,7 +78,7 @@ Also, since we're running in the background, you won't see any output. To see th
 Since we're running the container in the background, you might want to stop it. To stop the container, run `docker stop caddy`. To start it again, run `docker start caddy`. To remove the container, run `docker rm caddy`.  
 
 ## Images  
-Now's probably a good time to talk about images. A Docker image is made up of layers. Each layer is a change to the filesystem. In past examples, we've been using images made by others. However, you can create your own images. This is done with a `Dockerfile`.
+Now's probably a good time to talk about images. A Docker image is made up of layers. Each layer is a change to the file system. In past examples, we've been using images made by others. However, you can create your own images. This is done with a `Dockerfile`.
 ### Creating a Dockerfile
 Create a file called `Dockerfile` with the following contents:  
 ```Dockerfile
@@ -105,3 +105,43 @@ Run `docker run --rm echo Hello, Docker!`.
 * `--rm`: Remove the container when it stops
 * `echo`: The image to run
 * `Hello, Docker!`: The argument to pass to `echo`
+
+## Docker Compose  
+Using `docker run` can get tedious. For example, if you have multiple containers that need to be run together, you would have to run multiple `docker run` commands. When you want to stop them, get logs, etc., you would have to do the same. This is where Docker Compose comes in.  
+Note that `docker-compose` has effectively been superseded by `docker compose`.  
+### Running a desktop environment in Docker  
+[LinuxServer](https://www.linuxserver.io/) is a group you may come across when self-hosting. They provide Docker images for a variety of services. In this example, we'll be using their [Webtop](https://github.com/linuxserver/docker-webtop) image. In some cases, you can clone the repository and run `docker-compose up`. However, it can be easier to just download the `docker-compose.yml` in its own directory. Docker will use the directory name to name containers, which is why I try to keep Compose files in a directory dedicated to the service or the cloned repository.  
+#### Create and navigate to a directory for the Webtop service  
+```sh
+mkdir webtop
+cd webtop
+```
+#### Create the `docker-compose.yml` file  
+The `linxuserver/webtop` image doesn't have a `docker-compose.yml` file. It does, however, have example contents of what the file should look like in the README. I've edited the example slightly. Refer to the repository for the more, possibly updated, information.  
+```yml
+---
+services:
+  webtop:
+    image: lscr.io/linuxserver/webtop:latest
+    container_name: webtop
+    security_opt:
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - TITLE=Webtop #optional
+    volumes:
+      - /path/to/data:/config
+      - /var/run/docker.sock:/var/run/docker.sock #optional
+    ports:
+      # Port 3000 is the web interface
+      # Port 3001 is the VNC interface
+      - 3000:3000
+      - 3001:3001
+    devices:
+      # This optional mount should help with hardware acceleration (host should be Linux)
+      - /dev/dri:/dev/dri
+    # The README mentions that this helps with preventing web browsers from crashing
+    shm_size: "1gb"
+    restart: unless-stopped
+```
