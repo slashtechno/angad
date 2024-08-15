@@ -1,20 +1,26 @@
 ---
 title: Introduction to Docker
 date: 2024-08-14
-lastmod: 2024-08-14
+lastmod: 2024-08-15
 draft: true
-tags: ["self-hosting"]
+tags: ["self-hosting", "Hack Club"]
 categories: ["guides"]
-# summary: Learn Docker in a way that should prevent unnecessary Stack Overflow visits
-description: An introduction to Docker and Docker Compose
+summary: "Learn the basics of Docker including: running containers, creating images, and using Docker Compose"
+description: A practical introduction to Docker and Docker Compose
 ---
+<!-- I wrote this for a virtual workshop I hosted for Hack Club. The workshop was an introduction to Docker and Docker Compose. -->
 
 ## What’s Docker?
 Docker is a tool for containerizing software. In _some_ cases, it can replace a VM. Each _container_ has its own file system. However, core system components are shared. **The container uses the host’s kernel.**
-### Speed! ⚡ 
+### Speed ⚡
 Due to the shared kernel, containers can run extremely fast. Imagine setting up an Ubuntu Server VM. Most would not consider the startup time insignificant. Now, try running a Docker Container.
 
-A quick note, if you’re on Linux, you may have to use `sudo`.
+## Prerequisites  
+You need to have Docker installed. You can find the installation instructions [here](https://docs.docker.com/get-docker/).  
+If you're on macOS or Windows, I recommend using Docker Desktop as that should easily integrate with WSL on Windows and on macOS, it should create a VM. On Linux, you probably should just run the [installation script](https://get.docker.com/). Run this with `curl -fsSL https://get.docker.com | sh`. If you want to first see what the script does without making changes to your system, you can run `curl -fsSL https://get.docker.com/ | sh -s -- --dry-run`.
+
+A quick note, if you’re on Linux, you will probably have to use `sudo`. 
+
 ## Running your first container
 `docker run -it --rm ubuntu:latest bash`
 ### Explanation:
@@ -159,4 +165,19 @@ services:
     restart: unless-stopped
 ```
 #### Running the Docker Compose file
-Run `docker compose up -d` in the same directory as the `docker-compose.yml` file. To run it in the foreground, remove the `-d`. To remove the container, run `docker compose down`.
+Run `docker compose up -d` in the same directory as the `docker-compose.yml` file. To run it in the foreground, remove the `-d`. To remove the container, run `docker compose down`.  
+
+## Some cool projects to check out  
+* [Portainer](https://www.portainer.io/): A web interface for managing Docker containers
+  * [Portainer CE Installation](https://docs.portainer.io/start/install-ce)
+* [Docker-OSX](https://github.com/sickcodes/Docker-OSX): Run macOS in Docker
+  * Runs a container that runs QEMU in order to virtualize macOS  
+  * It can generate serial numbers and board IDs meaning iMessage works!
+  * Can be accessed through X11 forwarding or VNC
+* [dockur/windows](https://github.com/dockur/windows): Run Windows in Docker
+  * Uses QEMU to virtualize Windows
+  * Can be accessed through a web browser or via RDP
+  * If you're on an ARM64 machine, like the Raspberry Pi, [dockur/windows-arm](https://github.com/dockur/windows-arm/) is available
+* [dock-droid](https://github.com/sickcodes/dock-droid): Run Android in Docker
+  * Like the above two, uses QEMU
+  * Can be accessed through X11 forwarding or VNC
