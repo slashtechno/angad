@@ -2,7 +2,7 @@
 title: Introduction to Docker
 date: 2024-08-14
 lastmod: 2024-08-15
-draft: true
+draft: false
 tags: ["self-hosting", "Hack Club"]
 categories: ["guides"]
 summary: "Learn the basics of Docker including: running containers, creating images, and using Docker Compose"
