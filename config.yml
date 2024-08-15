@@ -65,10 +65,10 @@ menu:
       name: Github
       url: https://github.com/slashtechno
       weight: 4
-    - identifier: fiverr
-      name: Fiverr
-      url: https://www.fiverr.com/angadbehl
-      weight: 3
+    # - identifier: fiverr
+    #   name: Fiverr
+    #   url: https://www.fiverr.com/angadbehl
+    #   weight: 3
     - identifier: about
       name: About
       url: about/
