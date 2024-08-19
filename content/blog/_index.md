@@ -1,6 +1,6 @@
 ---
 title: Blog
-description: "Thoughts, stories and ideas." 
+description: "Thoughts, stories, and ideas." 
 buttonLinks: 
     - text: "project-related posts"
       url: "/categories/projects"
