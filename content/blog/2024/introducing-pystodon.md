@@ -6,7 +6,7 @@ lastmod: 2024-06-06
 # summary:
 draft: false
 categories: ["projects"]
-tags: ["projects", "python", "mastodon"]
+tags: ["python"]
 ---
 ## The beginning
 I've been working on a project called [Pystodon](https://github.com/slashtechno/pystodon). Pystodon is a Mastodon bot that I started working on in August of 2023, nearly a year before writing this post. While developing it, I noticed that I had the opportunity to build it like a framework by focusing on customizability through code. This was my first time building a library-like program and I tried to focus on usability not just for people interacting with the bot but also anyone who wanted to customize it.  

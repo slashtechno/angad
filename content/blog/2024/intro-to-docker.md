@@ -1,6 +1,6 @@
 ---
 title: Introduction to Docker
-date: 2024-08-14
+date: 2024-08-15
 lastmod: 2024-08-15
 draft: false
 tags: ["self-hosting", "Hack Club"]
@@ -8,7 +8,7 @@ categories: ["guides"]
 summary: "Learn the basics of Docker including: running containers, creating images, and using Docker Compose"
 description: A practical introduction to Docker and Docker Compose
 ---
-<!-- I wrote this for a virtual workshop I hosted for Hack Club. The workshop was an introduction to Docker and Docker Compose. -->
+I wrote this for a virtual workshop I hosted for Hack Club. The workshop was an introduction to Docker and Docker Compose.
 
 ## What’s Docker?
 Docker is a tool for containerizing software. In _some_ cases, it can replace a VM. Each _container_ has its own file system. However, core system components are shared. **The container uses the host’s kernel.**

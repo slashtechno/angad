@@ -1,12 +1,15 @@
 <div class="post-content">
-    <!-- <div> -->
-        <style>
-            .post-content a.button {
-                margin: 0;
-                box-shadow: none; /* Removes the box shadow */
-            }
-        </style>
-    {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
-        <a href="{{ "/categories/" | relLangURL }}{{ $name | urlize }}" class="button">{{ $name | title }}</a>
-    {{ end }}
+    <style>
+        .post-content a.button {
+            margin: 0;
+            box-shadow: none;
+            /* Removes the box shadow */
+            display: inline-block;
+        }
+    </style>
+    <p>Categories:
+        {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
+        <a href="{{ " /categories/" | relLangURL }}{{ $name | urlize }}" class="button">{{ $name | title }}</a>
+        {{ end }}
+    </p>
 </div>
