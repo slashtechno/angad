@@ -47,7 +47,7 @@ VIA Rail allowed Hack Club, along with other passengers, to stay on the train fo
 {{<collapse summary="Linus Media Group and the illisuion of overkill hardware">}}
 We were able to visit Linus Media Group and got a tour of their space. While seeing the spaces where they filmed their videos was cool, the most interesting part was getting to talk with some of the team members. From the videos on the LMG channels, it's easy to get the impression that everyone's using overkill hardware. I was able to talk to one of the writers, whose name I'm unfortunately forgetting, about how they daily-drive a Dell machine with an 8th Gen i5 (or i7, I don't remember) for writing scripts. It shows how you as long as the hardware is usable, it doesn't matter if it's using the latest graphics card or CPU. What matters is that work gets done.  
 {{</ collapse >}}
-<!-- TODO: add a picture or two -->
+{{< figure src="lmg-selfie.jpg" caption="A picture of Advay, [Kai](https://github.com/KaiPereira), and me outside the Linus Media Group office" >}}
 
 ## Day 5  
 {{<collapse summary="Closing ceremony and the simulation of cool conversations">}}
