@@ -8,13 +8,13 @@ categories: ["life"]
 summary: A journey across Canada with some really cool people 
 ---
 
-I've made each day collapsible to allow for you to just read the pictures and summaries if you'd like. Just click the summary to expand the day's events.
+**I've made each day collapsible to allow for you to just read the pictures and summaries if you'd like. Just click the summary to expand the day's events.**
 
 ### Some background  
 ### Hack Club  
-I joined [Hack Club](https://hackclub.com/) in late-May of 2024. Hack Club is an incredible non-profit organization comprised of over 35,000 teen programmers, hackers, and makers. I joined as it seemed like a cool community, in addition to their YSWS initiatives. An example is [Arcade](https://hackclub.com/arcade) wherein you can earn stuff from laptops to microcontrollers, simply by working on personal projects.  
+I joined [Hack Club](https://hackclub.com/) in late-May of 2024. Hack Club is a non-profit organization comprised of over 35,000 teen programmers, hackers, and makers. I joined as it seemed like a cool community, in addition to their _you ship; we ship_ initiatives. An example is [Arcade](https://hackclub.com/arcade) wherein you can earn stuff from laptops to microcontrollers, simply by working on personal projects.  
 What I found incredible, however, were the [hackathons](https://hackathons.hackclub.com/). Recent hackathons have included [Apocalypse](https://apocalypse.hackclub.com/), which took place in Shopify Headquarters, and [The Trail](https://trail.hackclub.com/), a hackathon combined with a hike. One of the most recent
-hackathons was [The Boreal Express](https://boreal.hackclub.com/) [The Boreal Express](https://boreal.hackclub.com/).
+hackathons was [The Boreal Express](https://boreal.hackclub.com/).
 ### The Boreal Express  
 I learned about The Boreal Express shortly after joining Hack Club. Boreal was a hackathon that was supposed to be a transcontinental journey across Canada. It was taking place onboard The Canadian, a train known for its beautiful views. Only 50 applicants would be accepted for this all-expenses-paid journey. Initially, I thought about applying but didn’t prioritize it. I applied a week or two later. Upon submission of the application, I was told that I should receive a response by June 10. It was June 15.
 Assuming I missed the deadline, I moved on. I also couldn’t imagine myself being accepted, considering I had just joined Hack Club. Five days later, on June 20, I received a message regarding my application and if I would be open to a call regarding my application. I was somehow accepted out of 600 applicants.  
@@ -22,7 +22,7 @@ Assuming I missed the deadline, I moved on. I also couldn’t imagine myself bei
 
 ## Day 0-1
 {{<collapse summary="Traveling to Vancouver and meeting others">}}
-I flew to Vancouver along with one of my friends (who was also accepted) to Vancouver one day prior to the opening ceremony. The next day, along with the other attendees, who reached one day prior, we went to Jericho Beach and got to meet the others who were arriving. I also got to meet some cool people, such as [Panos](https://pakou.dev/), one of two attendees from Greece, seen here trying to pet a rabbit.  
+Along with one of my friends (who was also accepted), I flew to Vancouver one day prior to the planned date for the opening ceremony. The next day, along with the other attendees (who reached one day prior), we went to Jericho Beach and got to meet the others who were arriving. I also got to meet some cool people, such as [Panos](https://pakou.dev/), one of two attendees from Greece, seen here trying to pet a rabbit.  
 The beach provided a great view of the Vancouver skyline which looked particularly looked beautiful as darkness fell. Overnight, we stayed in HI Vancouver Jericho Beach hostel. Not before trying to take a selfie with a 2000+ lumen flashlight.   
 {{</ collapse >}}
 {{< figure src="jericho-beach-rabbit.jpg" caption="Panos trying to pet a rabbit" >}}
@@ -38,8 +38,8 @@ Around 10:20 PM, we began to see wildfires in the distance. At that point, I don
 
 ## Day 3  
 {{<collapse summary="The Jasper Wildfires, turning back, and a lot of caffeine">}}
-Early morning, the Jasper Wildfires started. Over 10,000 people were evacuated from Jasper. The train, at this point, turned back towards Vancouver. Whilst this was unfortunate, I doubt it was anywhere near as bad as what the people in Jasper were going through. I do wish that I was able to get more pictures of the scenery that we saw while the train was moving through the beautiful landscapes of Canada, however.
-VIA Rail allowed Hack Club, along with other passengers, to stay on the train for two nights while it was stationary at the station. Inside the train, stuff was mostly the same. Workshops, talks, hacking, and consumption of caffeine continued. For context, Hack Club managed to get 360 cans of Celsius for the trip. 
+Early morning, the Jasper Wildfires started. Over 10,000 people were evacuated from Jasper. The train, at this point, turned back towards Vancouver. Whilst this was unfortunate, I doubt it was anywhere near as bad as what the people in Jasper were going through.  
+VIA Rail allowed Hack Club, along with other passengers, to stay on the train for two nights while it was stationary at the station. Inside the train, stuff was mostly the same. Workshops, talks, hacking, and consumption of caffeine continued. For context, Hack Club managed to get 360 cans of Celsius for the trip. I do wish that I was able to get more pictures of the scenery that we saw while the train was moving through the beautiful landscapes of Canada, however.  
 {{</ collapse >}} 
 {{< figure src="celsius.jpg" caption="A picture from Day 4 showing what the fridge of Celsius looked like" >}} 
 
