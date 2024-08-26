@@ -51,8 +51,8 @@ params:
 outputs:
     home:
         - HTML
-        # - JSON
-        # - RSS
+        - JSON # Needed for the search feature
+        - RSS
 
 menu:
   main:
