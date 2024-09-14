@@ -9,7 +9,7 @@
     </style>
     <p>Categories:
         {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
-        <a href="{{ " /categories/" | relLangURL }}{{ $name | urlize }}" class="button">{{ $name | title }}</a>
+        <a href="{{ "/categories/" | relLangURL }}{{ $name | urlize }}" class="button">{{ $name | title }}</a>
         {{ end }}
     </p>
 </div>
