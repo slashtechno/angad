@@ -10,6 +10,7 @@ summary: "I flew out to San Francisco to demo Podium, a peer-judging platform I'
 cover:
     image: "view-from-sentry-hq-at-night.jpg"
     caption: "Looking out from Sentry HQ, Sephora's headquarters can also be seen."
+    relative: true
     
 ---
 Last weekend, I had the opportunity to go to [MakerHacks](https://www.makerhacks.org/) in San Francisco, California to test a project I’ve been working on for the past three months while contracting at Hack Club: [Podium](https://podium.hackclub.com), a peer-judging platform built for hackathons. 
