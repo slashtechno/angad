@@ -1,6 +1,7 @@
 ---
 title: Self-hosting a Matrix Server With Synapse
 date: 2023-09-03
+lastmod: 2025-04-02
 # summary: 
 draft: false
 tags: ["matrix", "self-hosting"]
@@ -50,7 +51,14 @@ server {
     }
 }
 ```  
-I use Cloudflare tunnel to proxy my Matrix subdomain, on port 443, to `<host IP>:8007`. However, a similar Nginx config can be used for federation as well. Just make sure that `http://localhost:8007` points to the Docker container and `matrix.example.com:443` points to the address where Matrix can be accessed from outside your network.  
+If you're using Caddy instead of Nginx:
+```
+:8008 {
+    respond /.well-known/matrix/server "{\"m.server\": \"matrix.example.com:443\"}" 200
+    reverse_proxy http://localhost:8007
+}
+```
+I use Cloudflare tunnel to proxy my Matrix subdomain, on port 443, to `<host IP>:8007`. However, a similar config can be used for federation as well. Just make sure that `http://localhost:8007` points to the Docker container and `matrix.example.com:443` points to the address where Matrix can be accessed from outside your network.  
 
 
 ### Running the Server
