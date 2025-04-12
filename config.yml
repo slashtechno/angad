@@ -25,7 +25,7 @@ params:
   profileMode:
     enabled: true
     # title: "Hi! I'm Angad!"
-    subtitle: "This is my portfolio/blog, whatever you want to call it. I'm a student and an aspiring software developer who loves tinkering with all things technology, especially self-hosting and open-source software."
+    subtitle: "Student & aspiring software developer."
     buttons:
       - name: Blog
         url: "/blog/"
@@ -65,10 +65,6 @@ markup:
 menu:
   main:
   # Right to left
-    - identifier: Sponsor
-      name: Sponsor
-      url: https://github.com/sponsors/slashtechno
-      weight: 5
     - identifier: github
       name: Github
       url: https://github.com/slashtechno
