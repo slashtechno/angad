@@ -7,28 +7,8 @@
         ".old-site": true,
         "public/": true
     },
-    "cSpell.words": [
-        "asyncio",
-        "customizability",
-        "dateparser",
-        "goatcounter",
-        "Goroutines",
-        "hidemeta",
-        "ShowFullTextinRSS",
-        "showtoc",
-        "Vostro"
-    ],
     "editor.wordWrap": "on",
-    "explorer.autoRevealExclude": {
-        "themes/": true
-    },
-    "languageToolLinter.languageTool.ignoredWordsInWorkspace": [
-        "categorybuttons",
-        "gan",
-        "jsondb",
-        "kasmvnc",
-        "linuxserver",
-        "rawhtml",
-        "webtop"
-    ]
+    // "explorer.autoRevealExclude": {
+        // "themes/": true
+    // },
 }

@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* @theme { */
+  /* --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, */
+    /* "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; */
+/* } */
+/*  */
+/* html, */
+/* body { */
+  /* @apply bg-white dark:bg-gray-950; */
+/*  */
+  /* @media (prefers-color-scheme: dark) { */
+    /* color-scheme: dark; */
+  /* } */
+/* } */
+/*  */
+
+
+
+/* https://coolors.co/palette/0d1b2a-1b263b-415a77-778da9-e0e1dd */
+body {
+  background-color: #415A77;
+  color: #E0E1DD;
+}
+
+a {
+  color: #778DA9;
+  text-decoration: underline;
+  text-underline-offset: 2.75px;
+}
