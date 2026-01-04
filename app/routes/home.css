@@ -1,0 +1,54 @@
+/* 
+  CENTERED NAV LIST - Reference Guide
+  Based on Hugo Theme Sam's minimalist design
+  https://github.com/victoriadrake/hugo-theme-sam
+*/
+
+.centered-nav {
+  /* Enable flexbox layout system */
+  display: flex;
+
+  /* Stack items vertically instead of horizontally */
+  flex-direction: column;
+
+  /* 
+    Center items on the main axis (vertical in column mode)
+    This is what makes the list centered vertically in the viewport
+  */
+  justify-content: center;
+
+  /* 
+    Center items on the cross axis (horizontal in column mode)
+    This is what makes the list centered horizontally in the viewport
+  */
+  align-items: center;
+
+  /* Take up full viewport height */
+  height: 100vh;
+
+  /* Add space between nav links */
+  gap: 2rem;
+}
+
+.centered-nav a {
+  /* Large, elegant text */
+  font-size: 3rem;
+  font-weight: 300;
+
+  /* Remove default link underline, will add custom one */
+  text-decoration: none;
+
+  /* Custom underline (thin line below text) */
+  border-bottom: 2px solid currentColor;
+
+  /* Smooth color transition on hover */
+  transition: all 0.3s ease;
+
+  /* Subtle letter spacing for elegance */
+  letter-spacing: 1.5px;
+}
+
+.centered-nav a:hover {
+  /* Lighten color on hover */
+  opacity: 0.7;
+}

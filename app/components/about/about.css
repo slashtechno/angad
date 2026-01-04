@@ -1,0 +1,40 @@
+/* https://htmlandcssguidebook.com/css/box-model/#:~:text=Horizontal%20Centering%20with%20Margin */
+.about-title {
+  margin: 0 auto; /*0 top and bottom, auto left and right*/
+  /* https://codelucky.com/css-max-width-min-width/ */
+  max-width: 40%;
+  text-align: center; /* Centers the text inside the element */
+  padding-top: 10vh;
+  font-size: 2.75rem;
+}
+.about-description {
+  margin: 0.75rem auto; /*0 top and bottom, auto left and right*/
+  text-align: center; /* Centers the text inside the element */
+  max-width: 40%;
+  font-size: 1rem;
+}
+
+#name {
+  color: #ff6600;
+  /* Rounded corners */
+  border-radius: 5px;
+  padding: 0 5px;
+  background-color: #ffe6cc;
+}
+
+/* https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Media_queries#media_feature_rules */
+@media screen and (max-width: 600px) {
+  .about-title {
+    font-size: 2rem;
+    max-width: 75%;
+  }
+  .about-description {
+    font-size: 1rem;
+    max-width: 75%;
+  }
+}
+
+.about-container {
+  width: 100%;
+  height: 100%;
+}
