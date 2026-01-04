@@ -11,13 +11,13 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <>
+<div id="homepage">
       {/* 
         Centered nav list using flexbox
         - flex-direction: column stacks links vertically
         - justify-content: center centers them on the vertical axis
         - align-items: center centers them on the horizontal axis
-        - height: 100vh makes it take up full viewport height
+        - ~~height: 100vh makes it take up full viewport height~~ Right below the about section so we can't do 100vh, since otherwise, it would push the about section offscreen (not necessarily the content, but at least the box)
       */}
       <About />
       <nav className="centered-nav">
@@ -25,6 +25,6 @@ export default function Home() {
         <a href="#projects">Projects</a>
         <a href="#contact">Contact</a>
       </nav>
-    </>
+    </div>
   );
 }

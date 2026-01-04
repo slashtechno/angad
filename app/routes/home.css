@@ -1,3 +1,10 @@
+#homepage {
+display: flex;
+flex-direction: column;
+min-height: 100vh; /* Forces the flexbox container to take up the etnire height so we can equally divide the screen */
+justify-content: center;
+}
+
 /* 
   CENTERED NAV LIST - Reference Guide
   Based on Hugo Theme Sam's minimalist design
@@ -24,7 +31,7 @@
   align-items: center;
 
   /* Take up full viewport height */
-  height: 100vh;
+  /* height: 100vh; */
 
   /* Add space between nav links */
   gap: 2rem;
