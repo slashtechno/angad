@@ -31,7 +31,7 @@
   flex-grow: 0;      /* don't expand to fill leftover space */
   flex-shrink: 1;    /* allow shrink on very small viewports */
 
-  /* center links inside the (now smaller) nav area */
+  /* center links inside the nav area */
   justify-content: center;
   align-items: center;
   gap: 1.5rem;       /* slightly smaller spacing between links */

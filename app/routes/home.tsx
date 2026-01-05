@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { About } from "../components/about/about";
 import "./home.css";
+import LinkList from "~/components/LinkList/LinkList";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -25,11 +26,13 @@ export default function Home() {
       <div id="about">
         <About />
       </div>
-      <nav className="centered-nav">
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-      </nav>
+<nav>
+  <LinkList links={[
+    { href: "#about", label: "About" },
+    { href: "#projects", label: "Projects" },
+    { href: "#contact", label: "Contact" },
+  ]} />
+</nav>
     </div>
   );
 }
