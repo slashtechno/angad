@@ -10,9 +10,13 @@ export default function LinkList({
   // https://nextjs.org/learn/react-foundations/displaying-data-with-props#iterating-through-lists
   return (
     <CenteredList>
-      {links.map((link) => (
-        <Link to={link.href}>{link.label}</Link>
-      ))}
+      {links.map((link) => {
+        if (link.href.startsWith('http')) {
+          return <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+        } else {
+          return <Link to={link.href}>{link.label}</Link>
+        }
+      })}
     </CenteredList>
   );
 }
