@@ -19,6 +19,7 @@
 
 /* https://coolors.co/palette/0d1b2a-1b263b-415a77-778da9-e0e1dd */
 body {
+  font-family: 'Inter', system-ui, sans-serif;
   background-color: #415A77;
   color: #E0E1DD;
 }

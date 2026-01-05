@@ -1,8 +1,7 @@
 #homepage {
-display: flex;
-flex-direction: column;
-min-height: 100vh; /* Forces the flexbox container to take up the etnire height so we can equally divide the screen */
-justify-content: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Forces the flexbox container to take up the etnire height so we can equally divide the screen */
 }
 
 /* 
@@ -11,35 +10,36 @@ justify-content: center;
   https://github.com/victoriadrake/hugo-theme-sam
 */
 
+/* about: keep its natural height */
+#about {
+  flex-grow: 0;    /* don't expand to fill extra space */
+  flex-shrink: 1;  /* allow shrinking on very small screens */
+  flex-basis: auto; /* size based on its content */
+}
+
 .centered-nav {
-  /* Enable flexbox layout system */
-  display: flex;
+  display: flex;           /* use flexbox */
+  flex-direction: column;  /* stack links vertically */
 
-  /* Stack items vertically instead of horizontally */
-  flex-direction: column;
-
-  /* 
-    Center items on the main axis (vertical in column mode)
-    This is what makes the list centered vertically in the viewport
+  /*
+    reduce gap by controlling how the nav box sizes
+    - flex-basis: initial height of the nav area
+    - flex-grow: prevent it from expanding beyond that
+    - flex-shrink: allow small screens to shrink it
   */
+  flex-basis: 45vh;  /* smaller starting height (reduces gap) */
+  flex-grow: 0;      /* don't expand to fill leftover space */
+  flex-shrink: 1;    /* allow shrink on very small viewports */
+
+  /* center links inside the (now smaller) nav area */
   justify-content: center;
-
-  /* 
-    Center items on the cross axis (horizontal in column mode)
-    This is what makes the list centered horizontally in the viewport
-  */
   align-items: center;
-
-  /* Take up full viewport height */
-  /* height: 100vh; */
-
-  /* Add space between nav links */
-  gap: 2rem;
+  gap: 1.5rem;       /* slightly smaller spacing between links */
 }
 
 .centered-nav a {
   /* Large, elegant text */
-  font-size: 3rem;
+  font-size: 2.75rem;
   font-weight: 300;
 
   /* Remove default link underline, will add custom one */
