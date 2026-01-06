@@ -8,7 +8,7 @@ import LinkList from "~/components/LinkList/LinkList";
 import type { Route } from "./+types/route";
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const posts = import.meta.glob("/content/**/*.md", { eager: true, as: "raw" });
+  const posts = import.meta.glob("/content/**/*.md", { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
   return { posts };
 }
 
@@ -17,7 +17,7 @@ export default function MusingsRoute({loaderData}: Route.ComponentProps) {
     let postList: {href: string, content: string}[] = Object.entries(posts).map( ([path, content]) => {
         // The list looks like this:
         // {"href": "/content/2026/helloworld.md", "content": "---\ntitle: Hello, world!\ndate: 2026-01-05\n---\nFor a long time, my personal site was built with Hugo and a pre-built theme. It looked fine, but I wanted to learn more about React and CSS, so I made this!"}
-        return {href: path, content: content}; 
+        return {href: path, content: content};
     })
 
     console.log(postList)

@@ -23,6 +23,7 @@ export default function Home() {
   <LinkList links={[
     // { href: "#about", label: "About" },
     { href: "https://github.com/slashtechno", label: "Projects" },
+    { href: "/musings", label: "Musings" },
     // { href: "#contact", label: "Contact" },
   ]} />
 </nav>
