@@ -4,14 +4,22 @@
   https://github.com/victoriadrake/hugo-theme-sam
 */
 
+/* 
+        Centered nav list using flexbox
+        - flex-direction: column stacks links vertically
+        - justify-content: center centers them on the vertical axis
+        - align-items: center centers them on the horizontal axis
+        - ~~height: 100vh makes it take up full viewport height~~ Right below the about section so we can't do 100vh, since otherwise, it would push the about section offscreen (not necessarily the content, but at least the box)
+*/
+
 .centered-nav {
-  display: flex;           /* use flexbox */
-  flex-direction: column;  /* stack links vertically */
+  display: flex; /* use flexbox */
+  flex-direction: column; /* stack links vertically */
 
   /* center links inside the nav area */
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;       /* slightly smaller spacing between links */
+  gap: 1.5rem; /* slightly smaller spacing between links */
 }
 
 .centered-nav a {

@@ -11,10 +11,11 @@ export default function LinkList({
   return (
     <CenteredList>
       {links.map((link) => {
+        // https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key
         if (link.href.startsWith('http')) {
-          return <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+          return <a href={link.href} target="_blank" rel="noopener noreferrer" key={link.href}>{link.label}</a>
         } else {
-          return <Link to={link.href}>{link.label}</Link>
+          return <Link to={link.href} key={link.href}>{link.label}</Link>
         }
       })}
     </CenteredList>
