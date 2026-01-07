@@ -8,7 +8,7 @@ export interface PostRaw {
 
 export interface PostFrontmatter {
   title: string;
-  date: string; // seems dates get parsed automatically, so this might not be a string (https://github.com/jonschlinkert/gray-matter/issues/62)
+  date: string; // seems dates get parsed automatically, so this might not be a string (https://github.com/jonschlinkert/gray-matter/issues/62). Do some more research, and if needed, normalize it in parsePostRaw to yyyy-mm-dd string. 9
 }
 
 export interface Post {
@@ -48,6 +48,13 @@ export async function loadAllPostsParsed(): Promise<
 async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   const { data, content } = matter(postRaw.rawContent);
 
+  // Validate required frontmatter fields
+  if (!data.title || !data.date) {
+    throw new Error(
+      `Invalid frontmatter in ${postRaw.path}: missing title or date`
+    );
+  }
+
   // Deal with the path (https://www.w3schools.com/nodejs/nodejs_path.asp)
   // Slug (hello-world)
   const slug = path.basename(postRaw.path, path.extname(postRaw.path)); 
@@ -76,5 +83,5 @@ export async function getPostByPath(
   }
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
   // When the relativeHref matches, return that post. Otherwise, if nothing matches, return null.
-  return allPosts.find((post) => { post.relativeHref === postPath }) || null;
+  return allPosts.find((post) => post.relativeHref === postPath) || null;
 }
