@@ -28,8 +28,8 @@ export default function Home() {
             // { href: "#about", label: "About" },
             { href: "/musings", label: "Musings" },
             { href: "https://github.com/slashtechno", label: "GitHub (projects)" },
-            { href: "http://instagram.com/angadbehl", label: "Photography" },
-            { href: "http://meet.angad.me", label: "Schedule a meeting" },
+            { href: "https://instagram.com/angadbehl", label: "Photography" },
+            { href: "https://meet.angad.me", label: "Schedule a meeting" },
 
           ]}
           textSize={"2.75rem"}

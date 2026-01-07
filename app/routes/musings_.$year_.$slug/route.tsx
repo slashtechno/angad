@@ -1,4 +1,4 @@
-import { data, useLocation } from "react-router";
+import { data } from "react-router";
 import type { Route } from "./+types/route";
 import { getPostByYearAndSlug } from "~/.server/posts";
 import Markdown from 'react-markdown'
