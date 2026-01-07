@@ -7,6 +7,7 @@
 import LinkList from "~/components/LinkList/LinkList";
 import type { Route } from "./+types/route";
 import { loadAllPostsParsed } from "~/.server/posts";
+import "./musings.css";
 
 export async function loader({ params }: Route.LoaderArgs) {
     // Load all posts. Also caches them in allPosts variable in posts.ts
@@ -19,7 +20,7 @@ export default function MusingsRoute({loaderData}: Route.ComponentProps) {
     const {parsedPosts} = loaderData;
     
 return (
-    <div>
+    <div className="musings-container">
         <h1>Musings</h1>
         <LinkList links={
             parsedPosts.map( (post) => ({

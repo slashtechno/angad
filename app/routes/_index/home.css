@@ -1,8 +1,12 @@
 #homepage {
   display: flex;
   flex-direction: column;
-  /* I'm  not setting height since parent (body) already has 100% height set in app.css */
+
+  /* I'm  not setting min-height to a vh since parent (body) already has 100% height set in app.css */
   /* I had to set the height of the parent (body and html) to 100% in app.css so the footer could be pushed to the bottom */
+
+  min-height: 100%; /* Needed for us to center content vertically */
+  justify-content: center;
 }
 
 /* 
@@ -11,15 +15,3 @@
   https://github.com/victoriadrake/hugo-theme-sam
 */
 
-/* about: keep its natural height */
-#about {
-  flex-grow: 0;    /* don't expand to fill extra space */
-  flex-shrink: 1;  /* allow shrinking on very small screens */
-  flex-basis: auto; /* size based on its content */
-}
-
-.centered-nav {
-  flex-basis: 45vh;  /* smaller starting height (reduces gap) */
-  flex-grow: 0;      /* don't expand to fill leftover space */
-  flex-shrink: 1;    /* allow shrink on very small viewports */
-}
