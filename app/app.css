@@ -22,8 +22,20 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   background-color: #415A77;
   color: #E0E1DD;
+  display: flex;
+  flex-direction: column;
+  margin: 0;  /* Remove default margin */
 }
 
+/* Set both body and html to take full height so that the app container can fill the space */
+html, body {
+  height: 100%;
+}
+
+.app-container {
+  /* Fill the  available space with the outlet content */
+flex-grow: 1;
+}
 a {
   color: #778DA9;
   text-decoration: underline;

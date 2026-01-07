@@ -1,4 +1,4 @@
-import { About } from "../../components/about/about";
+import { About } from "../../components/About/About";
 import type { Route } from "./+types/route";
 import "./home.css";
 import LinkList from "~/components/LinkList/LinkList";
@@ -19,14 +19,17 @@ export default function Home() {
       <div id="about">
         <About />
       </div>
-<nav>
-  <LinkList links={[
-    // { href: "#about", label: "About" },
-    { href: "https://github.com/slashtechno", label: "Projects" },
-    { href: "/musings", label: "Musings" },
-    // { href: "#contact", label: "Contact" },
-  ]} textSize={"2.75rem"} />
-</nav>
+      <nav>
+        <LinkList
+          links={[
+            // { href: "#about", label: "About" },
+            { href: "https://github.com/slashtechno", label: "Projects" },
+            { href: "/musings", label: "Musings" },
+            // { href: "#contact", label: "Contact" },
+          ]}
+          textSize={"2.75rem"}
+        />
+      </nav>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 #homepage {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Forces the flexbox container to take up the etnire height so we can equally divide the screen */
+  /* I'm  not setting height since parent (body) already has 100% height set in app.css */
+  /* I had to set the height of the parent (body and html) to 100% in app.css so the footer could be pushed to the bottom */
 }
 
 /* 
