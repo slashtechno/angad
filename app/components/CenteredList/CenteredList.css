@@ -24,7 +24,8 @@
 
 .centered-nav a {
   /* Large, elegant text */
-  font-size: 2.75rem;
+  /* https://www.w3schools.com/css/css3_variables.asp */
+  font-size: var(--link-font-size, 2.25rem); /* set a fallback size if variable not set */
   font-weight: 300;
 
   /* Remove default link underline, will add custom one */

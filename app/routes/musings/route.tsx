@@ -6,26 +6,28 @@
 
 import LinkList from "~/components/LinkList/LinkList";
 import type { Route } from "./+types/route";
+import { loadAllPostsParsed } from "~/.server/posts";
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const posts = import.meta.glob("/content/**/*.md", { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
-  return { posts };
+    // Load all posts. Also caches them in allPosts variable in posts.ts
+    // When a post is requested individually, that cache is used by getPostByPath.
+    const parsedPosts = await loadAllPostsParsed(); 
+    return {parsedPosts};
 }
 
 export default function MusingsRoute({loaderData}: Route.ComponentProps) {
-    const {posts} = loaderData;
-    let postList: {href: string, content: string}[] = Object.entries(posts).map( ([path, content]) => {
-        // The list looks like this:
-        // {"href": "/content/2026/helloworld.md", "content": "---\ntitle: Hello, world!\ndate: 2026-01-05\n---\nFor a long time, my personal site was built with Hugo and a pre-built theme. It looked fine, but I wanted to learn more about React and CSS, so I made this!"}
-        return {href: path, content: content};
-    })
-
-    console.log(postList)
+    const {parsedPosts} = loaderData;
     
 return (
     <div>
         <h1>Musings</h1>
+        <LinkList links={
+            parsedPosts.map( (post) => ({
+                href: post.relativeHref,
+                label: post.frontmatter.title
+            }) )
 
+        }/>
     </div>
 )
 }   

@@ -25,7 +25,7 @@ export default function Home() {
     { href: "https://github.com/slashtechno", label: "Projects" },
     { href: "/musings", label: "Musings" },
     // { href: "#contact", label: "Contact" },
-  ]} />
+  ]} textSize={"2.75rem"} />
 </nav>
     </div>
   );
