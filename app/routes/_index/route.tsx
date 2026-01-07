@@ -3,19 +3,22 @@ import type { Route } from "./+types/route";
 import "./home.css";
 import LinkList from "~/components/LinkList/LinkList";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Angad Behl - Home" },
-    {
-      name: "description",
-      content: "Student, software developer, and photographer.",
-    },
-  ];
-}
+// > Since React 19, using the built-in <meta> element is recommended over the use of the route module's meta export. (https://reactrouter.com/start/framework/rou1te-module#meta)
+// export function meta({}: Route.MetaArgs) {
+//   return [
+//     { title: "Angad Behl - Home" },
+//     {
+//       name: "description",
+//       content: "Student, software developer, and photographer.",
+//     },
+//   ];
+// }
 
 export default function Home() {
   return (
     <div id="homepage">
+      <title >Angad Behl - Home</title>
+      <meta name="description" content="Student, software developer, and photographer." />
       <div id="about">
         <About />
       </div>
@@ -23,9 +26,11 @@ export default function Home() {
         <LinkList
           links={[
             // { href: "#about", label: "About" },
-            { href: "https://github.com/slashtechno", label: "Projects" },
             { href: "/musings", label: "Musings" },
-            // { href: "#contact", label: "Contact" },
+            { href: "https://github.com/slashtechno", label: "GitHub (projects)" },
+            { href: "http://instagram.com/angadbehl", label: "Photography" },
+            { href: "http://meet.angad.me", label: "Schedule a meeting" },
+
           ]}
           textSize={"2.75rem"}
         />

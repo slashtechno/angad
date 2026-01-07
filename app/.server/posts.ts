@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import matter from "gray-matter";
 import path from "path";
 
@@ -8,7 +9,7 @@ export interface PostRaw {
 
 export interface PostFrontmatter {
   title: string;
-  date: string; // seems dates get parsed automatically, so this might not be a string (https://github.com/jonschlinkert/gray-matter/issues/62). Do some more research, and if needed, normalize it in parsePostRaw to yyyy-mm-dd string. 9
+  date: string; 
 }
 
 export interface Post {
@@ -47,6 +48,11 @@ export async function loadAllPostsParsed(): Promise<
 
 async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   const { data, content } = matter(postRaw.rawContent);
+  // Convert the year to yyyy-mm-dd format if it's a Date object (which it most likely got automatically converted to https://github.com/jonschlinkert/gray-matter/issues/62)
+  if (data.date instanceof Date) {
+    // https://day.js.org/docs/en/parse/date and https://day.js.org/docs/en/display/format
+    data.date = dayjs(data.date).format("YYYY-MM-DD");
+  };
 
   // Validate required frontmatter fields
   if (!data.title || !data.date) {
@@ -74,13 +80,17 @@ return {
   };
 }
 
-export async function getPostByPath(
-  postPath: string
+export async function getPostByYearAndSlug(
+  year: string,
+  slug: string
 ): Promise<Post | null> {
   if (allPosts.length === 0) {
     console.log("allPosts is empty, loading posts to get post by path.");
     await loadAllPostsParsed();
   }
+
+  const postPath = `/musings/${year}/${slug}`;
+
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
   // When the relativeHref matches, return that post. Otherwise, if nothing matches, return null.
   return allPosts.find((post) => post.relativeHref === postPath) || null;
