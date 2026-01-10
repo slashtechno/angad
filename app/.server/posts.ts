@@ -19,6 +19,8 @@ export interface PostRaw {
 export interface PostFrontmatter {
   title: string;
   date: string;
+  // draft is optional in the frontmatter; the parser will default it to false when absent
+  draft?: boolean;
 }
 
 export interface Post {
@@ -45,13 +47,19 @@ export async function loadAllPostsParsed(): Promise<Post[]> {
     rawContent,
   }));
 
-  //   separate the frontmatter and the content
+  //  separate the frontmatter and the content
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
   const parsedPosts = await Promise.all(rawPosts.map(parsePostRaw));
 
+  // Filter out drafts
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+  const nonDraftPosts = parsedPosts.filter(
+    (post) => post.frontmatter.draft === false
+  );
+
   // https://www.geeksforgeeks.org/javascript/sort-an-object-array-by-date-in-javascript/
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
-  parsedPosts.sort(
+  nonDraftPosts.sort(
     (a, b) =>
     {
       // If a negative number is returned, a is sorted before b
@@ -60,12 +68,12 @@ export async function loadAllPostsParsed(): Promise<Post[]> {
     }
   )
 
-  allPosts = parsedPosts;
+  allPosts = nonDraftPosts;
   // console.log(
   //   "Loaded and parsed all posts, setting allPosts variable: ",
   //   allPosts
   // );
-  return parsedPosts;
+  return nonDraftPosts;
 }
 
 async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
@@ -81,6 +89,10 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
     throw new Error(
       `Invalid frontmatter in ${postRaw.path}: missing title or date`
     );
+  }
+
+  if (data.draft === undefined) {
+    data.draft = false;
   }
 
   // Get metadata from the path
