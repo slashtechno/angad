@@ -13,6 +13,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     // Load all posts. Also caches them in allPosts variable in posts.ts
     // When a post is requested individually, that cache is used by getPostByPath.
     const parsedPosts = await loadAllPostsParsed(); 
+    
     return {parsedPosts};
 }
 

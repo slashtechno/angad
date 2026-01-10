@@ -12,6 +12,8 @@ export default {
     
     // Generate prerender routes for all posts
     const musingRoutes = posts.map((post) => post.relativeHref);
+
+    console.debug("Prerendering routes for musings:", musingRoutes);
     
     // Return all routes to prerender: home, musings list, and all individual musings
     return [
