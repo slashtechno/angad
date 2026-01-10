@@ -9,22 +9,22 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
-    "@react-router/fs-routes": "^7.11.0",
-    "@react-router/node": "7.10.1",
-    "@react-router/serve": "7.10.1",
+    "@react-router/fs-routes": "^7.12.0",
+    "@react-router/node": "^7.12.0",
+    "@react-router/serve": "^7.12.0",
     "dayjs": "^1.11.19",
     "gray-matter": "^4.0.3",
     "isbot": "^5.1.31",
     "react": "^19.2.2",
     "react-dom": "^19.2.2",
     "react-markdown": "^10.1.0",
-    "react-router": "7.10.1",
+    "react-router": "^7.12.0",
     "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@react-router/dev": "7.10.1",
+    "@react-router/dev": "^7.12.0",
     "@tailwindcss/vite": "^4.1.13",
     "@types/node": "^22",
     "@types/react": "^19.2.7",
