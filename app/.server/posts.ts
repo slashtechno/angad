@@ -35,6 +35,13 @@ export interface Post {
 // Not too worried about global state, especially since we prerender
 export let allPosts: Post[] = [];
 
+/**
+ * Discover, parse, filter, sort, and cache all content posts found under /content/**/_index.md.
+ *
+ * Parses frontmatter and markdown for each discovered post, excludes posts marked as drafts, and sorts the remaining posts by date (newest first). Also updates the module-level `allPosts` variable with the resulting array.
+ *
+ * @returns An array of parsed `Post` objects for non-draft posts, sorted by date in descending order.
+ */
 export async function loadAllPostsParsed(): Promise<Post[]> {
   const posts = import.meta.glob(`/content/**/_index.md`, {
     eager: true,
@@ -76,6 +83,13 @@ export async function loadAllPostsParsed(): Promise<Post[]> {
   return nonDraftPosts;
 }
 
+/**
+ * Parse a raw post file into a normalized Post with metadata and rewritten image URLs.
+ *
+ * @param postRaw - Object containing the source file path and the raw markdown with frontmatter
+ * @returns A Post populated with relativeHref, slug, markdownContent (image URLs rewritten), frontmatter, category, and postDir
+ * @throws Error if the frontmatter is missing a required `title` or `date`
+ */
 async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   const { data, content } = matter(postRaw.rawContent);
   // Convert the year to yyyy-mm-dd format if it's a Date object (which it most likely got automatically converted to https://github.com/jonschlinkert/gray-matter/issues/62)
@@ -113,6 +127,12 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   };
 }
 
+/**
+ * Retrieve a parsed post matching the given canonical relative href.
+ *
+ * @param relativeHref - The post's canonical relative path (e.g. `/musings/2025/category/slug`)
+ * @returns The matching `Post` if found, `null` otherwise
+ */
 export async function getPostByRelativeHref(
   relativeHref: string
 ): Promise<Post | null> {
@@ -125,6 +145,18 @@ export async function getPostByRelativeHref(
   return allPosts.find((post) => post.relativeHref === relativeHref) || null;
 }
 
+/**
+ * Derives canonical post metadata (year, category, slug, relativeHref, and postDir) from a filesystem path to a post file.
+ *
+ * @param postPath - Absolute or relative filesystem path to the post file (typically an `_index.md` file)
+ * @returns An object containing:
+ *  - `year`: the first path segment representing the year
+ *  - `category`: joined intermediate path segments between year and slug (empty string if none)
+ *  - `slug`: the final directory name containing the post file
+ *  - `relativeHref`: canonical site-relative URL in the form `/musings/<year>/<category>/<slug>` (omits category segment when empty)
+ *  - `postDir`: the directory containing the post file (same as `path.dirname(postPath)`)
+ * @throws If no directories are found between the post file and the content root, or if the year or slug cannot be determined from the path
+ */
 async function parsePostPathForMetadata(postPath: string): Promise<{
   year: string;
   category: string;
@@ -203,6 +235,12 @@ async function parsePostPathForMetadata(postPath: string): Promise<{
   };
 }
 
+/**
+ * Determines whether the given directory is named "content" and contains a ".root" file.
+ *
+ * @param dirPath - Filesystem path of the directory to inspect
+ * @returns `true` if the directory name is "content" and a ".root" file exists inside it, `false` otherwise.
+ */
 async function nameContentAndHasRoot(dirPath: string): Promise<boolean> {
   const dirName = path.basename(dirPath);
   if (dirName !== "content") {
@@ -213,6 +251,12 @@ async function nameContentAndHasRoot(dirPath: string): Promise<boolean> {
   return rootFileExists;
 }
 
+/**
+ * Checks whether a given path denotes the filesystem root directory.
+ *
+ * @param dirPath - The path to test
+ * @returns `true` if `dirPath` represents the filesystem root, `false` otherwise.
+ */
 function isDirRoot(dirPath: string): boolean {
   //  Check if the directory is root
   const pathObj = path.parse(dirPath);
@@ -222,6 +266,13 @@ function isDirRoot(dirPath: string): boolean {
   return false;
 }
 
+/**
+ * Check whether a file exists at the path formed by joining `dirPath` and `fileName`.
+ *
+ * @param dirPath - Base directory path
+ * @param fileName - File name or relative path to append to `dirPath`
+ * @returns `true` if a file is accessible at the joined path, `false` otherwise
+ */
 export async function fileExists(
   dirPath: string,
   fileName: string
@@ -235,6 +286,15 @@ export async function fileExists(
   }
 }
 
+/**
+ * Rewrite non-HTTP, non-absolute image URLs in the given Markdown so they resolve to project content image paths.
+ *
+ * Scans image nodes in the Markdown and, for URLs that are neither absolute nor http(s), attempts to find a matching image under `/content/**` that lives in the same post directory and replaces the image URL with the resolved content module path.
+ *
+ * @param postDir - The directory path of the post (e.g., `/content/2026/...`) used as the base when resolving relative image paths
+ * @param markdownContent - The Markdown source to process
+ * @returns The transformed Markdown string with relative image URLs replaced by the resolved content image paths
+ */
 async function rewriteRelativeImageUrls(
   postDir: string,
   markdownContent: string

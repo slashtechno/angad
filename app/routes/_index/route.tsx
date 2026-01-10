@@ -12,7 +12,11 @@ import LinkList from "~/components/LinkList/LinkList";
 //       content: "Student, software developer, and photographer.",
 //     },
 //   ];
-// }
+/**
+ * Renders the site's homepage containing the document title and meta description, an About section, and a navigation list of links.
+ *
+ * @returns The JSX element representing the homepage.
+ */
 
 export default function Home() {
   return (

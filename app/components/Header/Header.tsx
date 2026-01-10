@@ -1,6 +1,14 @@
 import { Link, useLocation } from "react-router";
 import "./header.css"
-export default function Header() {
+/**
+     * Render the application header containing an optional back-navigation link and the GoatCounter script.
+     *
+     * The back-navigation link is omitted on the root path ("/"); on other paths it points to the appropriate
+     * destination and displays contextual text for musings-related routes.
+     *
+     * @returns A JSX `header` element that may include a back-navigation `Link` and always includes the GoatCounter script.
+     */
+    export default function Header() {
     // We need the location so we can conditionally render the "Back home" link
     // https://reactrouter.com/api/hooks/useLocation
     let location = useLocation();

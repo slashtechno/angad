@@ -25,6 +25,14 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+/**
+ * Render the top-level HTML document wrapper for the application.
+ *
+ * Renders an <html lang="en"> element with a head that includes charset, viewport, router-managed meta and link tags, and a body that contains the provided `children` plus router utilities for scroll restoration and scripts.
+ *
+ * @param children - The React nodes to place inside the document body
+ * @returns The complete HTML document element used as the app layout
+ */
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -43,6 +51,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Compose the application shell with the header, routed content area, and footer.
+ *
+ * @returns A React element containing the app header, a centered container with the router Outlet for page content, and the footer.
+ */
 export default function App() {
   return (
     <>
@@ -55,6 +68,14 @@ export default function App() {
   );
 }
 
+/**
+ * Render a user-facing error page for route responses and runtime errors.
+ *
+ * Displays a prioritized message and details for route error responses (e.g., a 404 page), falls back to a generic error message for other cases, and includes the error's message and stack trace when running in development.
+ *
+ * @param error - The router-provided error payload; may be a route error response or a thrown Error.
+ * @returns A React element showing an error title, a descriptive message, and — when available in development — the stack trace.
+ */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";

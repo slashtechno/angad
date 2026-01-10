@@ -1,5 +1,10 @@
 import './about.css';
 
+/**
+ * Render an "About" section with a title showing the name and a short descriptive paragraph containing a link to Hack Club.
+ *
+ * @returns A JSX element containing a container with a heading for "Angad!" and a paragraph describing the author and linking to https://hackclub.com/.
+ */
 export function About() {
   return (
     <div className="about-container">

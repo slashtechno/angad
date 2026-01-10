@@ -9,6 +9,13 @@ import type { Route } from "./+types/route";
 import { loadAllPostsParsed } from "~/.server/posts";
 import "./musings.css";
 
+/**
+ * Load all parsed posts and provide them to the route.
+ *
+ * This also primes the posts module cache used for subsequent individual post lookups.
+ *
+ * @returns An object with `parsedPosts`: an array of parsed post entries
+ */
 export async function loader({ params }: Route.LoaderArgs) {
     // Load all posts. Also caches them in allPosts variable in posts.ts
     // When a post is requested individually, that cache is used by getPostByPath.
@@ -17,6 +24,12 @@ export async function loader({ params }: Route.LoaderArgs) {
     return {parsedPosts};
 }
 
+/**
+ * Render the Musings page with a heading and a list of links to parsed posts.
+ *
+ * @param loaderData - Route loader data containing `parsedPosts`, an array of parsed post objects used to build link items (`href` from `post.relativeHref`, `label` from `post.frontmatter.title`)
+ * @returns The React element for the Musings page containing an H1 and a LinkList of post links
+ */
 export default function MusingsRoute({loaderData}: Route.ComponentProps) {
     const {parsedPosts} = loaderData;
     
