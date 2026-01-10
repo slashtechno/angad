@@ -30,6 +30,7 @@ export interface Post {
   postDir: string; // Directory where the _index.md is located, e.g. /content/2025/life/photography/my-new-camera
 }
 
+// Not too worried about global state, especially since we prerender
 export let allPosts: Post[] = [];
 
 export async function loadAllPostsParsed(): Promise<Post[]> {
@@ -47,6 +48,17 @@ export async function loadAllPostsParsed(): Promise<Post[]> {
   //   separate the frontmatter and the content
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
   const parsedPosts = await Promise.all(rawPosts.map(parsePostRaw));
+
+  // https://www.geeksforgeeks.org/javascript/sort-an-object-array-by-date-in-javascript/
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#sorting_array_of_objects
+  parsedPosts.sort(
+    (a, b) =>
+    {
+      // If a negative number is returned, a is sorted before b
+      // A later date will have a greater timestamp, so `b - a` will sort in descending order
+      return new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime();
+    }
+  )
 
   allPosts = parsedPosts;
   // console.log(
