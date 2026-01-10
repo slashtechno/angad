@@ -9,7 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Footer from "./components/Footer/footer";
+import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
 
 export const links: Route.LinksFunction = () => [
