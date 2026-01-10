@@ -272,14 +272,13 @@ async function rewriteRelativeImageUrls(
               `/content/**/*.{jpg,png,gif,jpeg}`,
               { eager: true, import: "default" }
             ) as Record<string, string>;
-            const images = Object.keys(imageModules);
-            // ['/cont  ent/2026/test/loading/helloworld/test.jpg']
-            const imageUrl = images.find((imgPath) => {
+            // Find the matching image entry [path, resolvedUrl]
+            const imageEntry = Object.entries(imageModules).find(([imgPath]) => {
               return imgPath.startsWith(postDir + "/") && imgPath.endsWith("/" + src);
             });
 
-            // Set the new URL and then set the node to our custom image node
-            imageNode.url = imageUrl!;
+            // Set the new URL to the resolved asset URL
+            imageNode.url = imageEntry ? imageEntry[1] : src;
             node = imageNode;
             // console.log("Rewritten image node:", node);
           }

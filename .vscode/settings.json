@@ -1,10 +1,10 @@
 {
     "files.eol": "\n",
-    // "search.exclude": {
-    //     "themes/*": true,
-    // },
+    "search.exclude": {
+        ".site-archives/": true,
+    },
     "files.exclude": {
-        ".old-site": true,
+        ".site-archives/": true,
     },
     "editor.wordWrap": "on",
     // "explorer.autoRevealExclude": {
