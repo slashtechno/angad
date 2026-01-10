@@ -2,7 +2,14 @@ import { dir } from "console";
 import dayjs from "dayjs";
 import { access, constants } from "fs/promises";
 import matter from "gray-matter";
-import path, { join } from "path";
+import type { Root } from "node_modules/remark-parse/lib";
+import type { Node } from "node_modules/unified/lib";
+import path, { isAbsolute, join, resolve } from "path";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import { unified } from "unified";
+import { visit } from "unist-util-visit";
+import plugin from "vite-plugin-devtools-json";
 
 export interface PostRaw {
   path: string;
@@ -26,7 +33,7 @@ export interface Post {
 export let allPosts: Post[] = [];
 
 export async function loadAllPostsParsed(): Promise<Post[]> {
-  const posts = import.meta.glob("/content/**/_index.md", {
+  const posts = import.meta.glob(`/content/**/_index.md`, {
     eager: true,
     query: "?raw",
     import: "default",
@@ -65,9 +72,8 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   }
 
   // Get metadata from the path
-  const { year, category, slug, relativeHref , postDir} = await parsePostPathForMetadata(
-    postRaw.path
-  );
+  const { year, category, slug, relativeHref, postDir } =
+    await parsePostPathForMetadata(postRaw.path);
   console.debug(
     `Parsed post metadata for ${postRaw.path}: year=${year}, category=${category}, slug=${slug}, relativeHref=${relativeHref}`
   );
@@ -75,7 +81,8 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   return {
     relativeHref: relativeHref,
     slug: slug,
-    markdownContent: content,
+    markdownContent: await rewriteRelativeImageUrls(postDir, content),
+    // markdownContent: content,
     frontmatter: data as PostFrontmatter,
     category: category,
     postDir: postDir,
@@ -202,4 +209,69 @@ export async function fileExists(
   } catch {
     return false;
   }
+}
+
+async function rewriteRelativeImageUrls(
+  postDir: string,
+  markdownContent: string
+): Promise<string> {
+  // Not sure how the remark stuff works exactly, mostly just took from the examples and tried to adapt it to work with src attributes. See https://github.com/remarkjs/remark?tab=readme-ov-file#what-is-this
+  // This complex glob import and rewrite stuff is required to be able to do `![test](test.jpg)`, but it appears `<img src="/content/2026/test/loading/helloworld/test.jpg" alt="test using file protocol"/>` might work either way.
+
+  function pluginToModifySrc() {
+    return function (tree: Root) {
+      visit(tree, "image", (node: Node) => {
+
+        
+        // { "type": "image", "title": null, "url": "test.jpg", "alt": "test", "position": { "start": { "line": 3, "column": 1, "offset": 158 }, "end": { "line": 3, "column": 18, "offset": 175 } } }
+        if (node.type === "image") {
+          // Create intersection type with UR
+          type ImageNode = Node & { url: string };
+          const imageNode = node as ImageNode;
+          const src = imageNode.url;
+          if (
+            src &&
+            !src.startsWith("http://") &&
+            !src.startsWith("https://") &&
+            isAbsolute(src) === false
+          ) {
+
+
+            // const imgUrl = new URL(
+            //   join(
+            //   postDir.slice(1), src
+            //   ),
+            //   import.meta.url
+            // ).href;
+
+            const imageModules = import.meta.glob(
+              `/content/**/*.{jpg,png,gif,jpeg}`,
+              { eager: true, import: "default" }
+            ) as Record<string, string>;
+            const images = Object.keys(imageModules);
+            // ['/cont  ent/2026/test/loading/helloworld/test.jpg']
+            const imageUrl = images.find((imgPath) => {
+              return imgPath.startsWith(postDir + "/") && imgPath.endsWith("/" + src);
+            });
+
+            // Set the new URL and then set the node to our custom image node
+            imageNode.url = imageUrl!;
+            node = imageNode;
+            // console.log("Rewritten image node:", node);
+          }
+        }
+
+
+      });
+    };
+  }
+
+  const vFile = await unified()
+    .use(remarkParse)
+    .use(pluginToModifySrc)
+    .use(remarkStringify)
+    .process(markdownContent);
+
+  const newContent = String(vFile);
+  return newContent;
 }

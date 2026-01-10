@@ -2,9 +2,9 @@ import { data } from "react-router";
 import type { Route } from "./+types/route";
 import remarkGfm from "remark-gfm";
 import { getPostByRelativeHref } from "~/.server/posts";
-import Markdown from "react-markdown";
+import Markdown, { defaultUrlTransform } from "react-markdown";
 import "./musing.css";
-import { isAbsolute, join, resolve } from "path";
+import rehypeRaw from "rehype-raw";
 // https://reactrouter.com/start/framework/data-loading#static-data-loading
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -52,35 +52,13 @@ export default function MusingYearIdRoute({
       {/* https://github.com/remarkjs/react-markdown?tab=readme-ov-file#appendix-b-components */}
       {/* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions */}
       <Markdown
-        remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
-        components={{
-          img(props) {
-            // // props: { src: 'test.jpg', alt: 'test', node: { type: 'element', tagName: 'img', properties: { src: 'test.jpg', alt: 'test' }, children: [], position: { start: {...}, end: {...} } } }
-            const { node, src, ...rest } = props;
-
-            // Rewrite the src (https://vite.dev/guide/assets#new-url-url-import-meta-url) if the path ~~is relative (requires ./ be used or whatever else makes path.parse(path).dir === '.')~~ is not absolute and it does not include http(s)://
-            if (
-              src &&
-              !src.startsWith("http://") &&
-              !src.startsWith("https://") &&
-              isAbsolute(src) === false
-            ) {
-              console.log("Rewriting relative image src:", src);
-              const imgUrl = new URL(resolve(post.postDir.slice(1), src), import.meta.url)
-                .href;
-                console.log("Rewritten image URL:", imgUrl);
-              const newSrc = imgUrl;
-              return <img src={newSrc} {...rest} />;
-            }
-            // Theoretically, if img was unknown, React.createElement might be usable
-            else {
-              console.log(
-                "Image src is absolute, external, or missing; not rewriting:",
-                src
-              );
-              return <img src={src} {...rest} />;
-            }
-          },
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]} rehypePlugins={[rehypeRaw]} urlTransform={(url) => {
+          // don't worry about file://, but otherwise, pass through the default transformer
+          if (url.startsWith("file://")) {
+            return url;
+          } else {
+            return defaultUrlTransform(url);
+          }
         }}
       >
         {post?.markdownContent}
