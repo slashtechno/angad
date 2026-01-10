@@ -15,6 +15,10 @@
 /* } */
 /*  */
 
+:root {
+  --warm-light-background-color: #ffe6cc;
+  --warm-light-text-color: #ff6600;
+}
 
 
 /* https://coolors.co/palette/0d1b2a-1b263b-415a77-778da9-e0e1dd */
@@ -40,4 +44,11 @@ a {
   color: #778DA9;
   text-decoration: underline;
   text-underline-offset: 2.75px;
+}
+#name {
+  color: var(--warm-light-text-color);
+  /* Rounded corners */
+  border-radius: 5px;
+  padding: 0 5px;
+  background-color: var(--warm-light-background-color);
 }

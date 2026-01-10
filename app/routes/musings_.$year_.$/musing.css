@@ -1,9 +1,16 @@
 .info {
-  margin: 0.5rem 0 5rem;
+  /* top | left/right | bottom */
+  margin: 0.25rem 0 3.5rem; 
   text-align: center;
 }
 h2 {
   font-size: 2.5rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+h4 {
+  font-size: 1.5rem;
 }
 
 .musing-container {
@@ -16,7 +23,9 @@ h2 {
   line-height: 1.6;
   max-width: 50%;
   margin: 0 auto;
-  padding: 4rem;
+  padding: 0  4rem;
+  /* row gap, column gap */
+  gap: 0.85rem;
 }
 
 @media screen and (max-width: 600px) {

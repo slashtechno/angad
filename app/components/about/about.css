@@ -14,13 +14,7 @@
   font-size: 1rem;
 }
 
-#name {
-  color: #ff6600;
-  /* Rounded corners */
-  border-radius: 5px;
-  padding: 0 5px;
-  background-color: #ffe6cc;
-}
+/* #name moved to app.css */
 
 /* https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Media_queries#media_feature_rules */
 @media screen and (max-width: 600px) {

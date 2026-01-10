@@ -1,0 +1,13 @@
+header {
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Aligning_items */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 0.25rem;
+}
+
+header a{
+    text-decoration: underline;
+    text-decoration-thickness: 0.5px;
+    text-underline-offset: .65px;
+}

@@ -15,8 +15,6 @@ export default function Footer() {
             <Link to="/">{"<-"} Back home</Link>
         </div>
         )}
-        <script data-goatcounter="https://sudo.goatcounter.com/count"
-        async src="/assets/count.js"></script>
         </footer>
     );
     }

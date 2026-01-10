@@ -8,5 +8,7 @@ h1 {
     flex-direction: column;
     justify-content: center ;
     height: 100%;
+    padding: 0rem 4rem;
+    text-align: center;
 }
 
