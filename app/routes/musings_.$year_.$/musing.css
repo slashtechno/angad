@@ -1,0 +1,42 @@
+.info {
+  /* top | left/right | bottom */
+  margin: 0.25rem 0 3.5rem; 
+  text-align: center;
+}
+h2 {
+  font-size: 2.5rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+h4 {
+  font-size: 1.5rem;
+}
+
+.musing-container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  height: 100%;
+
+  /* Improve readability */
+  line-height: 1.6;
+  max-width: 50%;
+  margin: 0 auto;
+  padding: 0  4rem;
+  /* row gap, column gap */
+  gap: 0.85rem;
+}
+
+@media screen and (max-width: 600px) {
+  .musing-container {
+    max-width: 90%;
+    padding: 1rem;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 900px) {
+  .musing-container {
+    max-width: 80%;
+    padding: 2rem;
+  }
+}
