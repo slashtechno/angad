@@ -20,6 +20,7 @@ export interface Post {
   markdownContent: string; // Will be rendered with react-markdown
   frontmatter: PostFrontmatter;
   category: string; // If the path is /content/2025/life/photography/my-new-camera/_index.md, category is `life/photography`
+  postDir: string; // Directory where the _index.md is located, e.g. /content/2025/life/photography/my-new-camera
 }
 
 export let allPosts: Post[] = [];
@@ -64,10 +65,12 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
   }
 
   // Get metadata from the path
-  const { year, category, slug, relativeHref } = await parsePostPathForMetadata(
+  const { year, category, slug, relativeHref , postDir} = await parsePostPathForMetadata(
     postRaw.path
   );
-  console.debug(`Parsed post metadata for ${postRaw.path}: year=${year}, category=${category}, slug=${slug}, relativeHref=${relativeHref}`);
+  console.debug(
+    `Parsed post metadata for ${postRaw.path}: year=${year}, category=${category}, slug=${slug}, relativeHref=${relativeHref}`
+  );
 
   return {
     relativeHref: relativeHref,
@@ -75,10 +78,13 @@ async function parsePostRaw(postRaw: PostRaw): Promise<Post> {
     markdownContent: content,
     frontmatter: data as PostFrontmatter,
     category: category,
+    postDir: postDir,
   };
 }
 
-export async function getPostByRelativeHref(relativeHref: string): Promise<Post | null> {
+export async function getPostByRelativeHref(
+  relativeHref: string
+): Promise<Post | null> {
   if (allPosts.length === 0) {
     console.log("allPosts is empty, loading posts to get post by path.");
     await loadAllPostsParsed();
@@ -88,17 +94,14 @@ export async function getPostByRelativeHref(relativeHref: string): Promise<Post 
   return allPosts.find((post) => post.relativeHref === relativeHref) || null;
 }
 
-async function parsePostPathForMetadata(
-  postPath: string
-): Promise<{
+async function parsePostPathForMetadata(postPath: string): Promise<{
   year: string;
   category: string;
   slug: string;
   relativeHref: string;
+  postDir: string;
 }> {
   // Deal with the path (https://www.w3schools.com/nodejs/nodejs_path.asp)
-  console.log("Parsing post path for metadata:", postPath);
-
   /* Find content dir using find-up.
   From the find-up README:
   ```
@@ -118,28 +121,39 @@ async function parsePostPathForMetadata(
   // }, {type: 'directory'});
 
   let currentDir = path.dirname(postPath); // Start from the directory of the post file
+  // Store the post file directory
+  const postDir = currentDir;
   let dirsFound: string[] = [];
   // Run until we've either hit root or found the content dir
-  while (await nameContentAndHasRoot(currentDir) === false && isDirRoot(currentDir) === false) {
+  while (
+    (await nameContentAndHasRoot(currentDir)) === false &&
+    isDirRoot(currentDir) === false
+  ) {
     dirsFound.push(path.basename(currentDir));
     currentDir = path.dirname(currentDir); // Move up one directory
-  } 
+  }
 
   if (dirsFound.length === 0) {
-    throw new Error(`Could not parse post path for metadata: ${postPath}; no directories found above content dir, something is wrong.`);
+    throw new Error(
+      `Could not parse post path for metadata: ${postPath}; no directories found above content dir, something is wrong.`
+    );
   }
 
   // Reverse dirsFound since it starts with the first dir above _index.md
   dirsFound = dirsFound.reverse();
   // Now, it should look like ["life", "photography", "my-new-camera"], so remove the last element which is _index.md's dir and make it the slug
-  const slug = dirsFound.pop()
+  const slug = dirsFound.pop();
   if (!slug) {
-    throw new Error(`Could not determine slug from post path: ${postPath}; last element in dirsFound is undefined.`);
+    throw new Error(
+      `Could not determine slug from post path: ${postPath}; last element in dirsFound is undefined.`
+    );
   }
   // The year is the first element
   const year = dirsFound.shift();
   if (!year) {
-    throw new Error(`Could not determine year from post path: ${postPath}; first element in dirsFound is undefined.`);
+    throw new Error(
+      `Could not determine year from post path: ${postPath}; first element in dirsFound is undefined.`
+    );
   }
   // The rest is category
   const categoryParts = dirsFound;
@@ -147,13 +161,14 @@ async function parsePostPathForMetadata(
   // Combine to get the relative href
   // With category: "/musings/2025/life/photography/my-new-camera"
   // Without category: "/musings/2025/hello-world"
-  const relativeHref = `/musings/${year}/${category ? category + '/' : ''}${slug}`;
+  const relativeHref = `/musings/${year}/${category ? category + "/" : ""}${slug}`;
 
   return {
     year,
     category: category,
     slug,
-    relativeHref: relativeHref
+    relativeHref: relativeHref,
+    postDir: postDir,
   };
 }
 
@@ -168,10 +183,10 @@ async function nameContentAndHasRoot(dirPath: string): Promise<boolean> {
 }
 
 function isDirRoot(dirPath: string): boolean {
-//  Check if the directory is root
+  //  Check if the directory is root
   const pathObj = path.parse(dirPath);
   if (pathObj.root === pathObj.dir) {
-  return true;
+    return true;
   }
   return false;
 }

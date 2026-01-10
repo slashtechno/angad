@@ -4,10 +4,10 @@ import remarkGfm from "remark-gfm";
 import { getPostByRelativeHref } from "~/.server/posts";
 import Markdown from "react-markdown";
 import "./musing.css";
+import { isAbsolute, join, resolve } from "path";
 // https://reactrouter.com/start/framework/data-loading#static-data-loading
 
 export async function loader({ params }: Route.LoaderArgs) {
-  console.debug("MusingYearIdRoute loader called with params:", params);
   // MusingYearIdRoute loader called with params: { year: '2026', '*': 'test/loading/helloworld' }
   const { year, "*": splat } = params;
 
@@ -30,7 +30,6 @@ export default function MusingYearIdRoute({
     return <div>Post not found.</div>;
     // This should not be reachable because of the loader's 404 handling
   }
-  console.debug(post?.frontmatter.title);
   return (
     <div className="musing-container">
       {/* We need a template string since otheriwse, it doesn't work and the following is errored: "React expects the `children` prop of <title> tags to be a string, number, bigint, or object with a novel `toString` method but found an Array with length 2 instead." */}
@@ -45,10 +44,45 @@ export default function MusingYearIdRoute({
         <p>
           <em>{post?.frontmatter.date}</em>
         </p>
-        <p>Category: <em>{post?.category}</em></p>
+        <p>
+          Category: <em>{post?.category}</em>
+        </p>
       </div>
       {/* https://github.com/remarkjs/react-markdown?tab=readme-ov-file#use-a-plugin */}
-      <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
+      {/* https://github.com/remarkjs/react-markdown?tab=readme-ov-file#appendix-b-components */}
+      {/* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions */}
+      <Markdown
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
+        components={{
+          img(props) {
+            // // props: { src: 'test.jpg', alt: 'test', node: { type: 'element', tagName: 'img', properties: { src: 'test.jpg', alt: 'test' }, children: [], position: { start: {...}, end: {...} } } }
+            const { node, src, ...rest } = props;
+
+            // Rewrite the src (https://vite.dev/guide/assets#new-url-url-import-meta-url) if the path ~~is relative (requires ./ be used or whatever else makes path.parse(path).dir === '.')~~ is not absolute and it does not include http(s)://
+            if (
+              src &&
+              !src.startsWith("http://") &&
+              !src.startsWith("https://") &&
+              isAbsolute(src) === false
+            ) {
+              console.log("Rewriting relative image src:", src);
+              const imgUrl = new URL(resolve(post.postDir.slice(1), src), import.meta.url)
+                .href;
+                console.log("Rewritten image URL:", imgUrl);
+              const newSrc = imgUrl;
+              return <img src={newSrc} {...rest} />;
+            }
+            // Theoretically, if img was unknown, React.createElement might be usable
+            else {
+              console.log(
+                "Image src is absolute, external, or missing; not rewriting:",
+                src
+              );
+              return <img src={src} {...rest} />;
+            }
+          },
+        }}
+      >
         {post?.markdownContent}
       </Markdown>
     </div>
