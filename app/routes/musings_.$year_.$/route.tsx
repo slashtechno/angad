@@ -5,6 +5,8 @@ import { getPostByRelativeHref } from "~/.server/posts";
 import Markdown, { defaultUrlTransform } from "react-markdown";
 import "./musing.css";
 import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import 'highlight.js/styles/nord.css';
 // https://reactrouter.com/start/framework/data-loading#static-data-loading
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -52,7 +54,8 @@ export default function MusingYearIdRoute({
       {/* https://github.com/remarkjs/react-markdown?tab=readme-ov-file#appendix-b-components */}
       {/* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions */}
       <Markdown
-        remarkPlugins={[[remarkGfm, { singleTilde: false }]]} rehypePlugins={[rehypeRaw]} urlTransform={(url) => {
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]} rehypePlugins={[rehypeRaw, [rehypeHighlight, {
+        }]]} urlTransform={(url) => {
           // don't worry about file://, but otherwise, pass through the default transformer
           if (url.startsWith("file://")) {
             return url;
