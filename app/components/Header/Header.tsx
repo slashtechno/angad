@@ -10,7 +10,7 @@ export default function Header() {
         {/* Hide back to home on / (https://react.dev/learn/conditional-rendering#logical-and-operator-) */}
         {location.pathname !== "/" && (
         <div className="links">
-            <Link to={location.pathname === "/musings" ? "/" : location.pathname.startsWith("/musings/") ? "/musings" : "/"} id="name">{location.pathname === "/musings" ? "Angad Behl's" : location.pathname.startsWith("/musings/") ? "<- Back to musings" : "<- Back home"}</Link>
+            <Link to={(location.pathname === "/musings" || location.pathname === "/musings/") ? "/" : location.pathname.startsWith("/musings/") ? "/musings" : "/"} id="name">{(location.pathname === "/musings" || location.pathname === "/musings/") ? "Angad Behl's" : location.pathname.startsWith("/musings/") ? "<- Back to musings" : "<- Back home"}</Link>
         </div>
         )}
         <script data-goatcounter="https://sudo.goatcounter.com/count"
