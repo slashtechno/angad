@@ -46,3 +46,10 @@
   /* Lighten color on hover */
   opacity: 0.7;
 }
+
+/* Shrink font on small screens so link text stays single-line, preventing border-bottom from spanning the full container width when text wraps */
+@media (max-width: 480px) {
+  .centered-nav a {
+    font-size: var(--link-font-size-mobile, 1.5rem);
+  }
+}

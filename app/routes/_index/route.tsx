@@ -30,6 +30,7 @@ export default function Home() {
             { href: "https://github.com/slashtechno", label: "GitHub (projects)" },
             { href: "https://instagram.com/angadbehl", label: "Photography" },
             { href: "https://meet.angad.me", label: "Schedule a meeting" },
+            {href: "https://linkedin.com/in/angadbehl", label: "LinkedIn"},
 
           ]}
           textSize={"2.75rem"}
