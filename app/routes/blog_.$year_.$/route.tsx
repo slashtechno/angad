@@ -1,11 +1,12 @@
-import { redirect } from "react-router";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router";
 import type { Route } from "./+types/route";
 
-export function loader({ params }: Route.LoaderArgs) {
-  const { year, "*": splat } = params;
-  return redirect(`/musings/${year}/${splat}`, 301);
-}
-
 export default function BlogRedirect() {
+  const { year, "*": splat } = useParams();
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate(`/musings/${year}/${splat}`, { replace: true });
+  }, [year, splat, navigate]);
   return null;
 }
