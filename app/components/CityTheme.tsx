@@ -13,7 +13,7 @@ export default function CityTheme({ children }: { children: ReactNode }) {
   useMouseParallax(mouseRef);
   useTouchParallax(mouseRef);
 
-  useCityAnimation({
+  const { tier } = useCityAnimation({
     canvasRef: canvasRef,
     city: {
       fog: 0.015,
@@ -37,7 +37,7 @@ export default function CityTheme({ children }: { children: ReactNode }) {
   return (
     <>
       <canvas ref={canvasRef} className="city-canvas" />
-      <CityChrome clockStr={clockStr} humStr={humStr}>{children}</CityChrome>
+      <CityChrome clockStr={clockStr} humStr={humStr} tier={tier}>{children}</CityChrome>
     </>
   );
 }

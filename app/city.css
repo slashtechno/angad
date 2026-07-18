@@ -273,6 +273,51 @@ body.city-landing .city-content {
   background: rgba(255, 140, 90, 0.15);
 }
 
+/* ── Quality warning badge ──────────────────── */
+.city-quality-warn {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  color: #ffb84a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 1px solid rgba(255, 184, 74, 0.5);
+  background: rgba(20, 18, 14, 0.7);
+  backdrop-filter: blur(4px);
+  cursor: help;
+  outline: none;
+}
+.city-quality-warn:focus { border-color: #ffb84a; }
+.city-quality-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 18, 14, 0.95);
+  color: #e8e9ec;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  padding: 8px 10px;
+  width: max-content;
+  max-width: 240px;
+  border: 1px solid rgba(232, 233, 236, 0.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.city-quality-warn:hover .city-quality-tooltip,
+.city-quality-warn:focus .city-quality-tooltip { opacity: 1; }
+@media (hover: none) {
+  /* On touch devices, tooltip shows only while the element has focus (tap once). */
+  .city-quality-warn:focus .city-quality-tooltip { opacity: 1; }
+}
+
 /* ── Mobile responsive ──────────────────────── */
 @media (max-width: 768px) {
   .city-content h1 { font-size: 28px; }

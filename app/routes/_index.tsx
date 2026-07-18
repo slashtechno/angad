@@ -58,7 +58,7 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
   }, []);
 
   // ── Three.js scene ────────────────────────────
-  useCityAnimation({
+  const { tier } = useCityAnimation({
     canvasRef: canvasRef,
     city: {
       fog: 0.022,
@@ -103,7 +103,7 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <canvas ref={canvasRef} className="city-landing-canvas" />
-      <CityChrome clockStr={clockStr} humStr={humStr} overlay={
+      <CityChrome clockStr={clockStr} humStr={humStr} tier={tier} overlay={
         <>
           {/* Scroll hint */}
           <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>Scroll down to enter the city ↓</div>
@@ -140,7 +140,7 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
           <p>Teen developer. I joined <a href="https://hackclub.com/">Hack Club</a> in late-May 2024 and found a community of 35,000+ teen programmers, hackers, and makers.</p>
           <p>I build things that scratch my own itch — bots, bridges, CMS rewrites, email-LLM clients. Whatever's interesting this month.</p>
         </div>
-
+I
         {/* Shelf */}
         <div className={`city-panel right${sec === 2 ? " visible" : ""}`}>
           <div className="city-panel-tag">// Shelf</div>
