@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router";
 import type { ReactNode } from "react";
+import { SITE_LINKS } from "../lib/links";
 
 interface CityChromeProps {
   clockStr: string;
-  humStr: string;
+  dateStr: string;
   /** Current quality tier from useCityAnimation. >0 means effects were reduced. */
   tier?: 0 | 1 | 2 | 3;
   /** Optional overlay rendered after the chrome (e.g. landing-page scroll/dots/panels) */
@@ -12,7 +13,7 @@ interface CityChromeProps {
   children: ReactNode;
 }
 
-export function CityChrome({ clockStr, humStr, tier = 0, overlay, children }: CityChromeProps) {
+export function CityChrome({ clockStr, dateStr, tier = 0, overlay, children }: CityChromeProps) {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
@@ -24,28 +25,28 @@ export function CityChrome({ clockStr, humStr, tier = 0, overlay, children }: Ci
 
       {/* Top-left: brand */}
       <div className="city-ui city-ui-tl">
-        <div className="city-logo">ANGAD</div>
+        <div className="city-logo">ANGAD BEHL</div>
         <div className="city-logo-sub">// field notes</div>
-        <div className="city-copy"><span>© 2026</span><span>slashtechno</span></div>
+        <div className="city-copy"><span>© 2026</span><span>angadbehl</span></div>
         {!isHome && <Link to="/" className="city-back">← back home</Link>}
       </div>
 
-      {/* Top-right: manifesto */}
-      <div className="city-ui city-ui-tr">
-        <div className="city-manifesto-tag">//// Now</div>
-        <div className="city-manifesto-title">Tending the garden</div>
-        <div className="city-manifesto-text">Writing, building side projects, learning new things.</div>
-      </div>
+      {/* Top-right: link list — same links the original site exposes on home */}
+      <nav className="city-ui city-ui-tr" aria-label="Primary">
+        {SITE_LINKS.map((l) => (
+          <a key={l.href} href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>
+            {l.label}
+          </a>
+        ))}
+      </nav>
 
       {/* Quality warning (only when tier > 0) */}
       {tier > 0 && <QualityBadge tier={tier} />}
 
-      {/* Bottom-left: ambient readout */}
+      {/* Bottom-left: clock + date */}
       <div className="city-ambient">
         <div className="row"><span className="label">local</span><span>{clockStr}</span></div>
-        <div className="row"><span className="label">signal</span><span className="city-blink">● live</span></div>
-        <div className="row"><span className="label">lat/lng</span><span>37.7749° N, 122.4194° W</span></div>
-        <div className="row"><span className="label">hum</span><span>{humStr}</span></div>
+        <div className="row"><span className="label">date</span><span>{dateStr}</span></div>
       </div>
 
       {overlay}

@@ -16,13 +16,13 @@ export const lerpColor = (a: THREE.Color, b: THREE.Color, t: number) =>
 
 // ── Time-of-day palette ────────────────────────
 export const palettes = {
-  sky: [0x2a1f2e, 0x6b7d92, 0x6b88a8, 0x4a4a6a, 0x14182a],
-  ground: [0x2a2a35, 0x3a3d4a, 0x454852, 0x353645, 0x1a1c25],
-  fog: [0x3a2f3e, 0x8a9aae, 0x95a8b8, 0x6a5a7a, 0x1a1e30],
-  sunCol: [0xffaa66, 0xfff0d4, 0xfff8e0, 0xff7a3d, 0x4060a0],
-  sunInt: [1.2, 1.6, 1.8, 1.4, 0.3],
-  ambCol: [0x4a3a55, 0x9aaabe, 0xb0c0d0, 0x6a5a80, 0x2a3040],
-  ambInt: [0.4, 0.7, 0.8, 0.5, 0.2],
+  sky: [0x4a3a5e, 0x9aaabe, 0xb0c0d0, 0x8a7a9a, 0x3a3a5e],
+  ground: [0x3a3a45, 0x4a4d5a, 0x555862, 0x454655, 0x2a2c35],
+  fog: [0x5a4f5e, 0x9aaabe, 0xa5b8c8, 0x7a6a8a, 0x3a3e50],
+  sunCol: [0xffaa66, 0xffe0b4, 0xfff8e0, 0xff8a4d, 0x8060a0],
+  sunInt: [1.6, 2.0, 2.4, 1.8, 0.7],
+  ambCol: [0x6a5a75, 0xaaBabe, 0xc0d0e0, 0x8a7aA0, 0x5a5060],
+  ambInt: [0.6, 1.0, 1.2, 0.8, 0.4],
 };
 export function paletteAt(p: number, key: keyof typeof palettes) {
   const arr = palettes[key], idx = p * (arr.length - 1);

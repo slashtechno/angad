@@ -20,7 +20,11 @@ body.city-page .app-container {
 /* ── Landing page overrides ─────────────────── */
 body.city-landing {
   min-height: 500vh;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+body.city-landing::-webkit-scrollbar,
+html:has(body.city-landing)::-webkit-scrollbar { display: none; width: 0; height: 0; }
 /* Hide CityTheme's ambient canvas when on the landing page.
    Make .city-content transparent so it doesn't overlay the landing scene. */
 body.city-landing .city-canvas {
@@ -50,23 +54,23 @@ body.city-landing .city-content {
   width: 100vw;
   height: 100vh;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* ── Overlays ───────────────────────────────── */
 .city-vignette {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 35; /* below panels (45), above canvas (1) */
   pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 12, 18, 0.7) 100%);
 }
 .city-grain {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 40; /* sits between canvas (auto) and UI (50) so it doesn't ghost over text */
   pointer-events: none;
-  opacity: 0.4;
-  mix-blend-mode: overlay;
+  opacity: 0.35;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
@@ -82,6 +86,20 @@ body.city-landing .city-content {
 }
 .city-ui-tl { top: 28px; left: 32px; }
 .city-ui-tr { top: 28px; right: 32px; text-align: right; max-width: 240px; }
+.city-ui-tr a {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #e8e9ec;
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(232, 233, 236, 0.15);
+  pointer-events: auto;
+  transition: color 0.2s, border-color 0.2s;
+}
+.city-ui-tr a:hover { color: #ff8c5a; border-bottom-color: #ff8c5a; }
+.city-ui-tr a:last-child { border-bottom: none; }
 .city-logo { font-family: 'VT323', monospace; font-size: 32px; font-weight: 400; letter-spacing: 0.1em; line-height: 1; margin-bottom: 4px; }
 .city-logo-sub { font-size: 10px; opacity: 0.6; letter-spacing: 0.15em; }
 .city-copy { font-size: 10px; opacity: 0.6; line-height: 1.6; margin-top: 12px; }
@@ -99,9 +117,6 @@ body.city-landing .city-content {
   transition: border-color 0.2s;
 }
 .city-back:hover { border-bottom-color: #ff8c5a; }
-.city-manifesto-tag { font-size: 10px; opacity: 0.6; letter-spacing: 0.2em; margin-bottom: 6px; }
-.city-manifesto-title { font-family: 'VT323', monospace; font-size: 18px; font-weight: 400; margin-bottom: 8px; }
-.city-manifesto-text { font-size: 10px; line-height: 1.6; opacity: 0.7; }
 
 /* ── Ambient readout ────────────────────────── */
 .city-ambient {
@@ -209,12 +224,23 @@ body.city-landing .city-content {
 .city-hero.visible { opacity: 1; transform: translateY(0); }
 .city-hero .city-accent { color: #ff6b3d; }
 .city-hero-sub { font-size: 14px; letter-spacing: 0.1em; opacity: 0.7; margin-top: 16px; font-family: 'Space Mono', monospace; }
+.city-hero-cta {
+  margin-top: 24px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+.city-hero-cta a { color: #ff8c5a; text-decoration: none; border-bottom: 1px solid rgba(255, 140, 90, 0.4); }
+.city-hero-cta a:hover { border-bottom-color: #ff8c5a; }
+.city-hero-cta .sep { opacity: 0.4; margin: 0 6px; }
 
 /* ── Content panels ─────────────────────────── */
 .city-panel {
   position: fixed;
   z-index: 45;
-  pointer-events: auto;
+  pointer-events: none;
   max-width: 380px;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -224,34 +250,35 @@ body.city-landing .city-content {
   transform: translateY(20px);
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
-.city-panel.visible { opacity: 1; transform: translateY(0); }
-.city-panel.left { left: 80px; top: 50%; transform: translateY(-50%) translateX(-20px); max-width: 340px; }
+.city-panel.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.city-panel.left { left: 80px; top: calc(50% + 90px); transform: translateY(-50%) translateX(-20px); max-width: 340px; }
 .city-panel.left.visible { transform: translateY(-50%) translateX(0); }
-.city-panel.right { right: 80px; top: 50%; transform: translateY(-50%) translateX(20px); max-width: 340px; }
+.city-panel.right { right: 80px; top: calc(50% + 40px); transform: translateY(-50%) translateX(20px); max-width: 340px; }
 .city-panel.right.visible { transform: translateY(-50%) translateX(0); }
-.city-panel.center { left: 50%; top: 50%; transform: translate(-50%, -50%) translateY(20px); text-align: center; max-width: 500px; }
+.city-panel.center { left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) translateY(20px); text-align: center; max-width: 500px; }
 .city-panel.center.visible { transform: translate(-50%, -50%) translateY(0); }
 
-.city-panel-tag { font-size: 10px; opacity: 0.6; letter-spacing: 0.2em; margin-bottom: 12px; color: #ff8c5a; }
-.city-panel h2 { font-family: 'VT323', monospace; font-size: 36px; font-weight: 400; line-height: 1.05; margin: 0 0 16px 0; }
+.city-panel-tag { font-size: 10px; opacity: 0.8; letter-spacing: 0.2em; margin-bottom: 12px; color: #ff8c5a; text-shadow: 0 1px 3px rgba(10, 12, 18, 0.8); }
+.city-panel h2 { font-family: 'VT323', monospace; font-size: 36px; font-weight: 400; line-height: 1.05; margin: 0 0 16px 0; text-shadow: 0 2px 6px rgba(10, 12, 18, 0.8); }
 .city-panel h3 { font-family: 'VT323', monospace; font-size: 22px; font-weight: 400; margin: 0 0 12px 0; }
-.city-panel p { margin: 0 0 12px 0; font-size: 11px; line-height: 1.7; opacity: 0.9; }
+.city-panel p { margin: 0 0 12px 0; font-size: 11px; line-height: 1.7; text-shadow: 0 1px 3px rgba(10, 12, 18, 0.8); }
 .city-panel .meta { font-size: 10px; opacity: 0.6; margin-bottom: 6px; letter-spacing: 0.05em; }
 .city-panel a { color: #ff8c5a; text-decoration: none; border-bottom: 1px solid rgba(255, 140, 90, 0.4); }
 .city-panel a:hover { border-bottom-color: #ff8c5a; }
 
-.city-badge { display: inline-block; font-size: 9px; padding: 2px 6px; border: 1px solid rgba(232, 233, 236, 0.3); margin-right: 4px; opacity: 0.7; }
 .city-accent { color: #ff6b3d; }
 
-/* ── Shelf list ─────────────────────────────── */
-.city-shelf { list-style: none; margin: 0; padding: 0; }
-.city-shelf li { padding: 10px 0; border-bottom: 1px solid rgba(232, 233, 236, 0.15); font-size: 11px; cursor: pointer; transition: padding-left 0.2s, color 0.2s; }
-.city-shelf li:last-child { border-bottom: none; }
-.city-shelf li:hover { padding-left: 8px; color: #ff8c5a; }
-.city-shelf .title { display: block; font-size: 12px; margin-bottom: 2px; }
-.city-shelf .meta { display: block; font-size: 9px; opacity: 0.5; }
-.city-shelf a { color: inherit; text-decoration: none; display: block; border-bottom: none; }
-.city-shelf a:hover { border-bottom: none; }
+/* ── Projects list ──────────────────────────── */
+.city-projects { list-style: none; margin: 0; padding: 0; }
+.city-projects li { padding: 10px 0; border-bottom: 1px solid rgba(232, 233, 236, 0.12); font-size: 11px; transition: padding-left 0.2s, color 0.2s; }
+.city-projects li:last-child { border-bottom: none; }
+.city-projects li:hover { padding-left: 6px; color: #ff8c5a; }
+.city-projects a { color: inherit; text-decoration: none; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; border-bottom: none; }
+.city-projects a:hover { border-bottom: none; }
+.city-projects .title { font-family: 'VT323', monospace; font-size: 16px; color: #ff8c5a; }
+.city-projects .desc { grid-column: 1; font-size: 10px; opacity: 0.7; line-height: 1.4; }
+.city-projects .stars { grid-column: 2; grid-row: 1 / span 2; font-family: 'Space Mono', monospace; font-size: 10px; opacity: 0.6; white-space: nowrap; }
+.city-panel-lead { font-size: 10px; opacity: 0.7; margin-bottom: 12px; }
 
 /* ── Content area (layout) ──────────────────── */
 .city-content {
@@ -267,10 +294,6 @@ body.city-landing .city-content {
 }
 .city-content a {
   color: #ff8c5a;
-}
-.city-content #name {
-  color: #ff6b3d;
-  background: rgba(255, 140, 90, 0.15);
 }
 
 /* ── Quality warning badge ──────────────────── */
@@ -323,8 +346,6 @@ body.city-landing .city-content {
   .city-content h1 { font-size: 28px; }
   .city-content p, .city-content li { font-size: 13px; }
   .city-logo { font-size: 24px; }
-  .city-manifesto-title { font-size: 14px; }
-  .city-manifesto-text { display: none; }
   .city-ui-tl { top: 16px; left: 16px; }
   .city-ui-tr { top: 16px; right: 16px; max-width: 160px; }
   .city-ambient { left: 16px; bottom: 16px; font-size: 9px; }

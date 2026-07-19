@@ -1,33 +1,26 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { Route } from "./+types/_index";
-import { loadAllPostsParsed } from "../.server/posts";
 import { lerp, ss } from "../lib/cityScene";
 import { useCityAnimation } from "../lib/useCityAnimation";
+import { useClock } from "../lib/useClock";
+import { EMAIL, SITE_LINKS, SITE_PROJECTS } from "../lib/links";
 import { CityChrome } from "../components/CityChrome";
 import "../city.css";
 
-export async function loader({}: Route.LoaderArgs) {
-  const posts = await loadAllPostsParsed();
-  return { posts: posts.slice(0, 5) };
-}
-
 const camPath = [
-  { pos: [0, 22, 70], look: [0, 10, 0], time: 0.05 },
-  { pos: [-14, 3, 30], look: [4, 5, 10], time: 0.3 },
-  { pos: [0, 6, 5], look: [-10, 8, -25], time: 0.55 },
-  { pos: [8, 2, -35], look: [-2, 4, -55], time: 0.78 },
-  { pos: [0, 14, -75], look: [0, 10, 0], time: 0.97 },
+  { pos: [0, 18, 55], look: [0, 8, 0] },     // hero
+  { pos: [-12, 4, 20], look: [2, 5, 0] },      // about
+  { pos: [6, 5, -4], look: [-6, 6, -22] },     // projects
+  { pos: [4, 3, -30], look: [-2, 5, -50] },    // now
+  { pos: [0, 12, -60], look: [0, 8, 0] },      // end
 ];
-const sections = ["About", "Author", "Shelf", "Now", "Contact"];
+const sections = ["Hi", "About", "Projects", "Now", "—"];
 
 // ── Component ───────────────────────────────────
-export default function CityLanding({ loaderData }: Route.ComponentProps) {
-  const { posts } = loaderData;
+export default function CityLanding() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
   const currentSectionRef = useRef(0);
-  const [clockStr, setClockStr] = useState("--:--:--");
-  const [humStr, setHumStr] = useState("— dB");
+  const { clockStr, dateStr } = useClock();
   const [smoothProgress, setSmoothProgress] = useState(0);
   const progressRef = useRef({ target: 0, smooth: 0 });
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -61,9 +54,9 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
   const { tier } = useCityAnimation({
     canvasRef: canvasRef,
     city: {
-      fog: 0.022,
-      initialCameraPos: [0, 5, 30],
-      initialCameraLook: [0, 4, 0],
+      fog: 0.012,
+      initialCameraPos: [0, 18, 65],
+      initialCameraLook: [0, 8, 0],
     },
     updateCamera: (camera, t) => {
       const p = progressRef.current;
@@ -81,16 +74,13 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
         lerp(c0.look[1], c1.look[1], lt),
         lerp(c0.look[2], c1.look[2], lt));
     },
-    onTick: (t, dt, time) => {
+    onTick: (t, dt) => {
       const p = progressRef.current;
       p.smooth = lerp(p.smooth, p.target, dt * 4);
       setSmoothProgress(p.smooth);
 
       const secIdx = Math.round(p.smooth * 4);
       if (secIdx !== currentSectionRef.current) { currentSectionRef.current = secIdx; setCurrentSection(secIdx); }
-
-      setClockStr(`${String(Math.floor(6 + time * 18)).padStart(2, "0")}:${String(Math.floor((time * 18 * 60) % 60)).padStart(2, "0")}:${String(Math.floor(t * 60) % 60).padStart(2, "0")}`);
-      setHumStr(`${(38 + Math.sin(t * 0.5) * 3 + Math.random() * 0.5).toFixed(1)} dB`);
     },
   });
 
@@ -99,14 +89,17 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
   }, []);
 
   const sec = currentSection;
+  const github = SITE_LINKS.find((l) => l.label === "github")!;
+  const photography = SITE_LINKS.find((l) => l.label === "photography")!;
+  const meeting = SITE_LINKS.find((l) => l.label === "schedule a meeting")!;
 
   return (
     <>
       <canvas ref={canvasRef} className="city-landing-canvas" />
-      <CityChrome clockStr={clockStr} humStr={humStr} tier={tier} overlay={
+      <CityChrome clockStr={clockStr} dateStr={dateStr} tier={tier} overlay={
         <>
           {/* Scroll hint */}
-          <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>Scroll down to enter the city ↓</div>
+          <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>scroll ↓</div>
 
           {/* Dots */}
           <div className="city-dots">
@@ -129,28 +122,38 @@ export default function CityLanding({ loaderData }: Route.ComponentProps) {
       }>
         {/* Hero */}
         <div className={`city-hero${sec === 0 ? " visible" : ""}`}>
-          a city<br />that <span className="city-accent">never</span><br />sits still.
-          <div className="city-hero-sub">Tended slowly. Built one block at a time. A digital garden in motion.</div>
+          Hi! I'm <span className="city-accent">Angad</span>.
+          <div className="city-hero-sub">High-school student, photographer, and software developer.</div>
+          <div className="city-hero-cta">
+            {SITE_LINKS.map((l, i) => (
+              <span key={l.href}>
+                <a href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>{l.label}</a>
+                {i < SITE_LINKS.length - 1 && <span className="sep">·</span>}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Author */}
+        {/* About */}
         <div className={`city-panel left${sec === 1 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// Author</div>
-          <h2>slashtechno</h2>
-          <p>Teen developer. I joined <a href="https://hackclub.com/">Hack Club</a> in late-May 2024 and found a community of 35,000+ teen programmers, hackers, and makers.</p>
-          <p>I build things that scratch my own itch — bots, bridges, CMS rewrites, email-LLM clients. Whatever's interesting this month.</p>
+          <div className="city-panel-tag">// About</div>
+          <h2>What I do</h2>
+          <p>I build software, take photos, and write the occasional musing. The software lives on <a href={github.href} target="_blank" rel="noopener noreferrer">GitHub</a>; the photos live on <a href={photography.href} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+          <p>I joined <a href="https://hackclub.com/" target="_blank" rel="noopener noreferrer">Hack Club</a> in 2024 and spent a stretch contracting on <a href="https://podium.hackclub.com" target="_blank" rel="noopener noreferrer">Podium</a>. Before that, I rode a train across Canada for a hackathon (<a href="https://boreal.hackclub.com/" target="_blank" rel="noopener noreferrer">Boreal</a>).</p>
         </div>
-I
-        {/* Shelf */}
+
+        {/* Projects */}
         <div className={`city-panel right${sec === 2 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// Shelf</div>
-          <h3>Recent writing</h3>
-          <ul className="city-shelf">
-            {posts.map((post, i) => (
-              <li key={i}>
-                <a href={post.relativeHref}>
-                  <span className="title">{post.frontmatter.title}</span>
-                  <span className="meta">{post.frontmatter.date} · {post.category}</span>
+          <div className="city-panel-tag">// Projects</div>
+          <h2>Recent projects</h2>
+          <p className="city-panel-lead">A few of the things I've built. Most live on GitHub.</p>
+          <ul className="city-projects">
+            {SITE_PROJECTS.map((p) => (
+              <li key={p.href}>
+                <a href={p.href} target="_blank" rel="noopener noreferrer">
+                  <span className="title">{p.name}</span>
+                  <span className="desc">{p.description}</span>
+                  <span className="stars">★ {p.stars}</span>
                 </a>
               </li>
             ))}
@@ -160,19 +163,17 @@ I
         {/* Now */}
         <div className={`city-panel left${sec === 3 ? " visible" : ""}`}>
           <div className="city-panel-tag">// Now</div>
-          <h2>Between things</h2>
-          <div className="meta">2026 — present</div>
-          <p>After a stretch building <a href="https://podium.hackclub.com">Podium</a> at <a href="https://hackclub.com/">Hack Club</a>, I'm back to tending the garden. Writing, smaller side projects, learning things I don't have a deadline for.</p>
-          <p>Before that: a transcontinental train hackathon across Canada (<a href="https://boreal.hackclub.com/">Boreal</a>), and a long string of side projects — <a href="https://github.com/slashtechno/llmail">LLMail</a>, <a href="https://github.com/slashtechno/pystodon">Pystodon</a>, Synapse guides.</p>
+          <h2>What I'm up to</h2>
+          <div className="meta">2026</div>
+          <p>Back to tending the garden. Writing, smaller side projects, learning things I don't have a deadline for.</p>
+          <p>Want to chat? <a href={meeting.href} target="_blank" rel="noopener noreferrer">Schedule a meeting</a> or email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
         </div>
 
-        {/* Contact */}
+        {/* End */}
         <div className={`city-panel center${sec === 4 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// Contact</div>
-          <h2>Get in touch</h2>
-          <p>The best way to reach me is GitHub. I read everything, I just take a while to reply.</p>
-          <p><a href="https://github.com/slashtechno">github.com/slashtechno</a><br /><a href="mailto:angad@slashtechno.com">angad@slashtechno.com</a></p>
-          <p style={{ marginTop: 24, fontSize: 10, opacity: 0.6 }}>// end of scroll — thanks for visiting the city</p>
+          <div className="city-panel-tag">// End</div>
+          <h2>Thanks for visiting.</h2>
+          <p><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
         </div>
       </CityChrome>
     </>

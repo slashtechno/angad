@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useCityAnimation } from "../lib/useCityAnimation";
+import { useClock } from "../lib/useClock";
 import { CityChrome } from "./CityChrome";
 import "../city.css";
 
 export default function CityTheme({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [clockStr, setClockStr] = useState("--:--:--");
-  const [humStr, setHumStr] = useState("— dB");
+  const { clockStr, dateStr } = useClock();
   const mouseRef = useRef({ x: 0, y: 0 });
 
   useBodyClass("city-page");
@@ -28,16 +28,12 @@ export default function CityTheme({ children }: { children: ReactNode }) {
         40 + Math.cos(t * 0.09) * 8);
       camera.lookAt(Math.sin(t * 0.1) * 3, 5, Math.cos(t * 0.07) * 3);
     },
-    onTick: (t, _dt, time) => {
-      setClockStr(`${String(Math.floor(6 + time * 18)).padStart(2, "0")}:${String(Math.floor((time * 18 * 60) % 60)).padStart(2, "0")}:${String(Math.floor(t * 60) % 60).padStart(2, "0")}`);
-      setHumStr(`${(38 + Math.sin(t * 0.5) * 3 + Math.random() * 0.5).toFixed(1)} dB`);
-    },
   });
 
   return (
     <>
       <canvas ref={canvasRef} className="city-canvas" />
-      <CityChrome clockStr={clockStr} humStr={humStr} tier={tier}>{children}</CityChrome>
+      <CityChrome clockStr={clockStr} dateStr={dateStr} tier={tier}>{children}</CityChrome>
     </>
   );
 }
