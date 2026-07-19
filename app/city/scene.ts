@@ -270,7 +270,7 @@ export function createCity(opts: CityOptions): CityHandles {
   const road = new THREE.Mesh(roadGeo, roadMat); road.position.y = 0.01; road.receiveShadow = true; city.add(road);
 
   // Stripes
-  const stripeMat = new THREE.MeshBasicMaterial({ color: 0xd0c890 });
+  const stripeMat = new THREE.MeshBasicMaterial({ color: 0xfcc419 }); // yellow center line (US-style opposing-traffic divider)
   for (let i = -95; i < 95; i += 3) {
     const s = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 1.5), stripeMat);
     s.rotation.x = -Math.PI / 2; s.position.set(0, 0.02, i); city.add(s);
@@ -317,9 +317,9 @@ export function createCity(opts: CityOptions): CityHandles {
     }
   }
 
-  // Traffic lights — 4 along the main road, each with a phase offset
+  // Traffic lights — 3 along the main road, each with a phase offset
   const trafficLights: { group: THREE.Group; lights: THREE.Mesh[]; z: number; phase: number }[] = [];
-  const lightZPositions = [-30, -10, 10, 30];
+  const lightZPositions = [-30, 0, 30];
   for (let i = 0; i < lightZPositions.length; i++) {
     const lz = lightZPositions[i];
     const tl = new THREE.Group();
