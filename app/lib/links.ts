@@ -23,7 +23,6 @@ export interface SiteProject {
   name: string;
   href: string;
   description: string;
-  stars: number;
 }
 
 export const SITE_PROJECTS: readonly SiteProject[] = [
@@ -31,30 +30,30 @@ export const SITE_PROJECTS: readonly SiteProject[] = [
     name: "cloudflare-gateway-adblocking",
     href: "https://github.com/slashtechno/cloudflare-gateway-adblocking",
     description: "Serverless ad blocking via Cloudflare Zero Trust gateway.",
-    stars: 32,
   },
   {
     name: "amped",
     href: "https://github.com/slashtechno/amped",
     description: "The missing account switcher for Amp and Claude Code.",
-    stars: 15,
   },
   {
     name: "wyzely-detect",
     href: "https://github.com/slashtechno/wyzely-detect",
     description: "Recognize faces/objects in a video stream and send notifications.",
-    stars: 12,
   },
   {
     name: "api-failover",
     href: "https://github.com/slashtechno/api-failover",
     description: "Use the Cloudflare API to change DNS records to maximize uptime.",
-    stars: 10,
   },
   {
-    name: "mount-usb",
-    href: "https://github.com/slashtechno/mount-usb",
-    description: "Mount USB drives on Linux, eject them and manage mount points.",
-    stars: 3,
+    name: "llmail",
+    href: "https://github.com/slashtechno/llmail",
+    description: "Interact with LLMs / AI through email.",
+  },
+  {
+    name: "tldscroll",
+    href: "https://github.com/slashtechno/tldscroll",
+    description: "A Slack bot that summarizes long messages and threads.",
   },
 ] as const;

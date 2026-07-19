@@ -273,11 +273,10 @@ body.city-landing .city-content {
 .city-projects li { padding: 10px 0; border-bottom: 1px solid rgba(232, 233, 236, 0.12); font-size: 11px; transition: padding-left 0.2s, color 0.2s; }
 .city-projects li:last-child { border-bottom: none; }
 .city-projects li:hover { padding-left: 6px; color: #ff8c5a; }
-.city-projects a { color: inherit; text-decoration: none; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; border-bottom: none; }
+.city-projects a { color: inherit; text-decoration: none; display: block; border-bottom: none; }
 .city-projects a:hover { border-bottom: none; }
 .city-projects .title { font-family: 'VT323', monospace; font-size: 16px; color: #ff8c5a; }
-.city-projects .desc { grid-column: 1; font-size: 10px; opacity: 0.7; line-height: 1.4; }
-.city-projects .stars { grid-column: 2; grid-row: 1 / span 2; font-family: 'Space Mono', monospace; font-size: 10px; opacity: 0.6; white-space: nowrap; }
+.city-projects .desc { font-size: 10px; opacity: 0.7; line-height: 1.4; }
 .city-panel-lead { font-size: 10px; opacity: 0.7; margin-bottom: 12px; }
 
 /* ── Content area (layout) ──────────────────── */

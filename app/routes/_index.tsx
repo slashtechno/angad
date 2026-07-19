@@ -148,7 +148,6 @@ export default function CityLanding() {
               <a href={p.href} target="_blank" rel="noopener noreferrer">
                 <span className="title">{p.name}</span>
                 <span className="desc">{p.description}</span>
-                <span className="stars">★ {p.stars}</span>
               </a>
             </li>
           ))}
