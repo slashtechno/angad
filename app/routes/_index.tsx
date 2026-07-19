@@ -159,7 +159,7 @@ export default function CityLanding() {
         <div className="city-panel-tag">// Now</div>
         <h2>What I'm up to</h2>
         <div className="meta">2026</div>
-        <p>Back to tending the garden. Writing, smaller side projects, learning things I don't have a deadline for.</p>
+        <p>Working on side projects and trying to live an interesting life.</p>
         <p>Want to chat? <a href={meeting.href} target="_blank" rel="noopener noreferrer">Schedule a meeting</a> or email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
       </div>
 
