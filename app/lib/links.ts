@@ -27,9 +27,9 @@ export interface SiteProject {
 
 export const SITE_PROJECTS: readonly SiteProject[] = [
   {
-    name: "cloudflare-gateway-adblocking",
-    href: "https://github.com/slashtechno/cloudflare-gateway-adblocking",
-    description: "Serverless ad blocking via Cloudflare Zero Trust gateway.",
+    name: "podium",
+    href: "https://github.com/hackclub/podium",
+    description: "Hack Club's open-source peer-judging platform for hackathons.",
   },
   {
     name: "amped",
@@ -37,23 +37,23 @@ export const SITE_PROJECTS: readonly SiteProject[] = [
     description: "The missing account switcher for Amp and Claude Code.",
   },
   {
-    name: "wyzely-detect",
-    href: "https://github.com/slashtechno/wyzely-detect",
-    description: "Recognize faces/objects in a video stream and send notifications.",
+    name: "jet-fund",
+    href: "https://github.com/hackclub/jet-fund",
+    description: "Get free flights/bus/train tickets just by programming.",
   },
   {
-    name: "api-failover",
-    href: "https://github.com/slashtechno/api-failover",
-    description: "Use the Cloudflare API to change DNS records to maximize uptime.",
+    name: "cloudflare-gateway-adblocking",
+    href: "https://github.com/slashtechno/cloudflare-gateway-adblocking",
+    description: "Serverless ad blocking via Cloudflare Zero Trust gateway.",
   },
   {
-    name: "llmail",
-    href: "https://github.com/slashtechno/llmail",
-    description: "Interact with LLMs / AI through email.",
+    name: "dash-of-pi",
+    href: "https://github.com/slashtechno/dash-of-pi",
+    description: "A smart WiFi dashcam runnable on a Raspberry Pi.",
   },
   {
-    name: "tldscroll",
-    href: "https://github.com/slashtechno/tldscroll",
-    description: "A Slack bot that summarizes long messages and threads.",
+    name: "gobackup-github",
+    href: "https://github.com/slashtechno/gobackup-github",
+    description: "Go program that utilizes the GitHub API to backup repos.",
   },
 ] as const;
