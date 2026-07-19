@@ -73,7 +73,7 @@ export function useCityAnimation(opts: CityAnimationOptions): { tier: QualityTie
     // tier, it can't.
     const fpsWindow: number[] = [];
     const FPS_CHECK_INTERVAL_MS = 2000;
-    const FPS_THRESHOLD = 25; // ponytail: lowered from 30; 30 falsely flagged capable M4 hardware during cold start
+    const FPS_THRESHOLD = 30;
     const WARMUP_MS = 6000;
     const CONSECUTIVE_DEMOTIONS_REQUIRED = 3;
     let lastFpsCheck = performance.now();
