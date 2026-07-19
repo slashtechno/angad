@@ -317,21 +317,25 @@ export function createCity(opts: CityOptions): CityHandles {
     }
   }
 
-  // Traffic lights — 3 along the main road, each with a phase offset
+  // Traffic lights — 3 along the main road, each with a phase offset, double-sided (one box, lights on both faces)
   const trafficLights: { group: THREE.Group; lights: THREE.Mesh[]; z: number; phase: number }[] = [];
   const lightZPositions = [-30, 0, 30];
   for (let i = 0; i < lightZPositions.length; i++) {
     const lz = lightZPositions[i];
     const tl = new THREE.Group();
     tl.add(mesh(new THREE.CylinderGeometry(0.08, 0.08, 5, 6), new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 }), [0, 2.5, 0]));
-    tl.add(mesh(new THREE.BoxGeometry(0.4, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 }), [0.5, 5.2, 0]));
-    const tRed = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x550000 }), [0.5, 5.6, 0.21]);
-    const tYel = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x554400 }), [0.5, 5.2, 0.21]);
-    const tGrn = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x004400 }), [0.5, 4.8, 0.21]);
-    tl.add(tRed); tl.add(tYel); tl.add(tGrn);
+    // One box at +x (like a real traffic light on a horizontal arm), with 3 lights on the +z face and 3 on the -z face
+    tl.add(mesh(new THREE.BoxGeometry(0.4, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.7 }), [0.5, 5.2, 0]));
+    const lights: THREE.Mesh[] = [];
+    for (const dir of [-1, 1]) {
+      lights.push(mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x550000 }), [0.5, 5.6, dir * 0.21]));
+      lights.push(mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x554400 }), [0.5, 5.2, dir * 0.21]));
+      lights.push(mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x004400 }), [0.5, 4.8, dir * 0.21]));
+    }
+    lights.forEach(l => tl.add(l));
     tl.position.set(-10, 0, lz); city.add(tl);
     // Phase offset so lights aren't all in sync (creates traffic flow)
-    trafficLights.push({ group: tl, lights: [tRed, tYel, tGrn], z: lz, phase: i * 1.3 });
+    trafficLights.push({ group: tl, lights, z: lz, phase: i * 1.3 });
   }
 
   // Neon signs
@@ -395,17 +399,25 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
 
   // Traffic lights — when disabled, all stay green (cars always go)
   for (const tl of trafficLights) {
+    const r = tl.lights[0].material as THREE.MeshBasicMaterial;
+    const y = tl.lights[1].material as THREE.MeshBasicMaterial;
+    const g = tl.lights[2].material as THREE.MeshBasicMaterial;
+    const r2 = tl.lights[3].material as THREE.MeshBasicMaterial;
+    const y2 = tl.lights[4].material as THREE.MeshBasicMaterial;
+    const g2 = tl.lights[5].material as THREE.MeshBasicMaterial;
     if (!trafficEnabled) {
-      (tl.lights[0].material as THREE.MeshBasicMaterial).color.setHex(0x330000);
-      (tl.lights[1].material as THREE.MeshBasicMaterial).color.setHex(0x332200);
-      (tl.lights[2].material as THREE.MeshBasicMaterial).color.setHex(0x00ff44);
+      r.color.setHex(0x330000); y.color.setHex(0x332200); g.color.setHex(0x00ff44);
+      r2.color.setHex(0x330000); y2.color.setHex(0x332200); g2.color.setHex(0x00ff44);
       continue;
     }
     const localPhase = trafficPhase * 0.3 + tl.phase;
     const cycle = Math.floor(localPhase) % 3;
-    (tl.lights[0].material as THREE.MeshBasicMaterial).color.setHex(cycle === 0 ? 0xff2020 : 0x330000);
-    (tl.lights[1].material as THREE.MeshBasicMaterial).color.setHex(cycle === 1 ? 0xffcc00 : 0x332200);
-    (tl.lights[2].material as THREE.MeshBasicMaterial).color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
+    r.color.setHex(cycle === 0 ? 0xff2020 : 0x330000);
+    y.color.setHex(cycle === 1 ? 0xffcc00 : 0x332200);
+    g.color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
+    r2.color.setHex(cycle === 0 ? 0xff2020 : 0x330000);
+    y2.color.setHex(cycle === 1 ? 0xffcc00 : 0x332200);
+    g2.color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
   }
 
   // Cars — move and obey traffic lights + follow the car ahead

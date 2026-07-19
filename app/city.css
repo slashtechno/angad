@@ -238,6 +238,11 @@ body.city-landing .city-content {
   font-size: 12px;
   line-height: 1.7;
   color: #e8e9ec;
+  background: rgba(10, 12, 18, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 20px 24px;
+  border-radius: 4px;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.6s ease, transform 0.6s ease;
@@ -250,10 +255,10 @@ body.city-landing .city-content {
 .city-panel.center { left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%) translateY(20px); text-align: center; max-width: 500px; }
 .city-panel.center.visible { transform: translate(-50%, -50%) translateY(0); }
 
-.city-panel-tag { font-size: 10px; opacity: 0.8; letter-spacing: 0.2em; margin-bottom: 12px; color: #ff8c5a; text-shadow: 0 1px 3px rgba(10, 12, 18, 0.8); }
-.city-panel h2 { font-family: 'VT323', monospace; font-size: 36px; font-weight: 400; line-height: 1.05; margin: 0 0 16px 0; text-shadow: 0 2px 6px rgba(10, 12, 18, 0.8); }
+.city-panel-tag { font-size: 10px; opacity: 0.8; letter-spacing: 0.2em; margin-bottom: 12px; color: #ff8c5a; }
+.city-panel h2 { font-family: 'VT323', monospace; font-size: 36px; font-weight: 400; line-height: 1.05; margin: 0 0 16px 0; }
 .city-panel h3 { font-family: 'VT323', monospace; font-size: 22px; font-weight: 400; margin: 0 0 12px 0; }
-.city-panel p { margin: 0 0 12px 0; font-size: 11px; line-height: 1.7; text-shadow: 0 1px 3px rgba(10, 12, 18, 0.8); }
+.city-panel p { margin: 0 0 12px 0; font-size: 11px; line-height: 1.7; }
 .city-panel .meta { font-size: 10px; opacity: 0.6; margin-bottom: 6px; letter-spacing: 0.05em; }
 .city-panel a { color: #ff8c5a; text-decoration: none; border-bottom: 1px solid rgba(255, 140, 90, 0.4); }
 .city-panel a:hover { border-bottom-color: #ff8c5a; }
