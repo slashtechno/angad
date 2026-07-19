@@ -8,7 +8,16 @@ export interface CityAnimationOptions {
   /** Per-frame camera controller. Receives (camera, t, dt) and sets position/lookAt. */
   updateCamera: (camera: THREE.PerspectiveCamera, t: number, dt: number) => void;
   /** Called once per frame after the camera is set; use for string updates, etc. */
-  onTick?: (t: number, dt: number, time: number) => void;
+  onTick?: (t: number, dt: number, time: number, handles?: CityHandles) => void;
+  /**
+   * If provided, overrides the auto-cycling time. Value is 0..1 where 0 = midnight,
+   * 0.5 = noon, 1 = midnight again. Lets the settings panel control time of day.
+   */
+  controlledTime?: number;
+  /** If false, traffic lights don't cycle (freeze on current color). Default true. */
+  trafficEnabled?: boolean;
+  /** Multiplier for car speed. 0 = frozen, 1 = normal, 2 = sped up. Default 1. */
+  trafficSpeed?: number;
   /** City scene options. `adaptiveQuality: true` (default) auto-tunes quality on mount, resize, and runtime FPS dips. */
   city?: {
     fog?: number;
@@ -84,7 +93,10 @@ export function useCityAnimation(opts: CityAnimationOptions): { tier: QualityTie
       animId = requestAnimationFrame(tick);
       const dt = Math.min(clock.getDelta(), 0.1);
       const t = clock.getElapsedTime();
-      trafficPhase += dt;
+      // Traffic phase only advances when traffic is enabled
+      const trafficOn = optsRef.current.trafficEnabled !== false;
+      const trafficMult = optsRef.current.trafficSpeed ?? 1;
+      if (trafficOn) trafficPhase += dt * trafficMult;
 
       // FPS sampling
       const now = performance.now();
@@ -107,11 +119,12 @@ export function useCityAnimation(opts: CityAnimationOptions): { tier: QualityTie
         }
       }
 
-      const time = (t * 0.008) % 1;
-      tickCity(handles, t, dt, trafficPhase, time);
+      // Time of day: use controlledTime if provided, otherwise auto-cycle slowly
+      const time = optsRef.current.controlledTime ?? (t * 0.008) % 1;
+      tickCity(handles, t, dt, trafficPhase, time, trafficOn);
 
       optsRef.current.updateCamera(handles.camera, t, dt);
-      optsRef.current.onTick?.(t, dt, time);
+      optsRef.current.onTick?.(t, dt, time, handles);
 
       handles.renderer.render(handles.scene, handles.camera);
     };

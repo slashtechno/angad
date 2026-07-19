@@ -200,7 +200,7 @@ export interface CityHandles {
   lamps: { light: THREE.PointLight; mesh: THREE.Mesh }[];
   signs: { mesh: THREE.Mesh; light: THREE.PointLight | null; color: number }[];
   cars: THREE.Group[];
-  trafficLights: THREE.Mesh[];
+  trafficLights: { group: THREE.Group; lights: THREE.Mesh[]; z: number; phase: number }[];
   buildingMats: THREE.MeshStandardMaterial[];
   sun: THREE.DirectionalLight;
   ambient: THREE.AmbientLight;
@@ -316,15 +316,22 @@ export function createCity(opts: CityOptions): CityHandles {
     }
   }
 
-  // Traffic light
-  const tl = new THREE.Group();
-  tl.add(mesh(new THREE.CylinderGeometry(0.08, 0.08, 5, 6), new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 }), [0, 2.5, 0]));
-  tl.add(mesh(new THREE.BoxGeometry(0.4, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 }), [0.5, 5.2, 0]));
-  const tRed = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x550000 }), [0.5, 5.6, 0.21]);
-  const tYel = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x554400 }), [0.5, 5.2, 0.21]);
-  const tGrn = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x004400 }), [0.5, 4.8, 0.21]);
-  tl.add(tRed); tl.add(tYel); tl.add(tGrn);
-  tl.position.set(-10, 0, 0); tl.userData.lights = [tRed, tYel, tGrn]; city.add(tl);
+  // Traffic lights — 4 along the main road, each with a phase offset
+  const trafficLights: { group: THREE.Group; lights: THREE.Mesh[]; z: number; phase: number }[] = [];
+  const lightZPositions = [-30, -10, 10, 30];
+  for (let i = 0; i < lightZPositions.length; i++) {
+    const lz = lightZPositions[i];
+    const tl = new THREE.Group();
+    tl.add(mesh(new THREE.CylinderGeometry(0.08, 0.08, 5, 6), new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 }), [0, 2.5, 0]));
+    tl.add(mesh(new THREE.BoxGeometry(0.4, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.7 }), [0.5, 5.2, 0]));
+    const tRed = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x550000 }), [0.5, 5.6, 0.21]);
+    const tYel = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x554400 }), [0.5, 5.2, 0.21]);
+    const tGrn = mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0x004400 }), [0.5, 4.8, 0.21]);
+    tl.add(tRed); tl.add(tYel); tl.add(tGrn);
+    tl.position.set(-10, 0, lz); city.add(tl);
+    // Phase offset so lights aren't all in sync (creates traffic flow)
+    trafficLights.push({ group: tl, lights: [tRed, tYel, tGrn], z: lz, phase: i * 1.3 });
+  }
 
   // Neon signs
   const signs: { mesh: THREE.Mesh; light: THREE.PointLight | null; color: number }[] = [];
@@ -348,13 +355,13 @@ export function createCity(opts: CityOptions): CityHandles {
   return {
     scene, camera, renderer,
     lamps, signs, cars,
-    trafficLights: [tRed, tYel, tGrn],
+    trafficLights,
     buildingMats, sun, ambient, roadMat,
   };
 }
 
 // ── Per-frame update ──────────────────────────
-export function tickCity(handles: CityHandles, t: number, dt: number, trafficPhase: number, time: number): { dark: number } {
+export function tickCity(handles: CityHandles, t: number, dt: number, trafficPhase: number, time: number, trafficEnabled = true): { dark: number } {
   const { sun, ambient, scene, renderer, roadMat, lamps, signs, cars, trafficLights } = handles;
 
   // Lighting
@@ -385,14 +392,62 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
     m.color.setRGB(baseR * k, baseG * k, baseB * k);
   });
 
-  // Cars
-  cars.forEach(c => { c.position.z += c.userData.dir * c.userData.speed * dt; if (Math.abs(c.position.z) > 100) c.position.z = -c.position.z; });
+  // Traffic lights — when disabled, all stay green (cars always go)
+  for (const tl of trafficLights) {
+    if (!trafficEnabled) {
+      (tl.lights[0].material as THREE.MeshBasicMaterial).color.setHex(0x330000);
+      (tl.lights[1].material as THREE.MeshBasicMaterial).color.setHex(0x332200);
+      (tl.lights[2].material as THREE.MeshBasicMaterial).color.setHex(0x00ff44);
+      continue;
+    }
+    const localPhase = trafficPhase * 0.3 + tl.phase;
+    const cycle = Math.floor(localPhase) % 3;
+    (tl.lights[0].material as THREE.MeshBasicMaterial).color.setHex(cycle === 0 ? 0xff2020 : 0x330000);
+    (tl.lights[1].material as THREE.MeshBasicMaterial).color.setHex(cycle === 1 ? 0xffcc00 : 0x332200);
+    (tl.lights[2].material as THREE.MeshBasicMaterial).color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
+  }
 
-  // Traffic light
-  const cycle = Math.floor(trafficPhase * 0.4) % 3;
-  (trafficLights[0].material as THREE.MeshBasicMaterial).color.setHex(cycle === 0 ? 0xff2020 : 0x330000);
-  (trafficLights[1].material as THREE.MeshBasicMaterial).color.setHex(cycle === 1 ? 0xffcc00 : 0x332200);
-  (trafficLights[2].material as THREE.MeshBasicMaterial).color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
+  // Cars — move and obey traffic lights
+  const STOP_DIST = 4; // units before light where cars start braking
+  cars.forEach(c => {
+    const dir = c.userData.dir;
+    const maxSpeed = c.userData.speed;
+    // Find the nearest light ahead of this car (in its direction of travel)
+    let targetSpeed = maxSpeed;
+    for (const tl of trafficLights) {
+      const dz = tl.z - c.position.z;
+      // Is the light ahead of us in our direction?
+      if (dir > 0 && dz > 0 && dz < STOP_DIST + 2) {
+        // Car going +z, light is ahead
+        const localPhase = trafficPhase * 0.3 + tl.phase;
+        const cycle = Math.floor(localPhase) % 3;
+        if (cycle === 0) { // Red — stop
+          // Brake harder the closer we are
+          const brake = Math.max(0, 1 - dz / (STOP_DIST + 2));
+          targetSpeed = Math.min(targetSpeed, maxSpeed * (1 - brake));
+        } else if (cycle === 1) { // Yellow — slow down
+          targetSpeed = Math.min(targetSpeed, maxSpeed * 0.3);
+        }
+        // Green (cycle === 2) — go at full speed
+      } else if (dir < 0 && dz < 0 && dz > -(STOP_DIST + 2)) {
+        // Car going -z, light is ahead (negative dz)
+        const dist = -dz;
+        const localPhase = trafficPhase * 0.3 + tl.phase;
+        const cycle = Math.floor(localPhase) % 3;
+        if (cycle === 0) {
+          const brake = Math.max(0, 1 - dist / (STOP_DIST + 2));
+          targetSpeed = Math.min(targetSpeed, maxSpeed * (1 - brake));
+        } else if (cycle === 1) {
+          targetSpeed = Math.min(targetSpeed, maxSpeed * 0.3);
+        }
+      }
+    }
+    // Smoothly approach target speed (simulate acceleration/deceleration)
+    c.userData.currentSpeed = c.userData.currentSpeed ?? maxSpeed;
+    c.userData.currentSpeed = lerp(c.userData.currentSpeed, targetSpeed, dt * 4);
+    c.position.z += dir * c.userData.currentSpeed * dt;
+    if (Math.abs(c.position.z) > 100) c.position.z = -c.position.z;
+  });
 
   return { dark };
 }

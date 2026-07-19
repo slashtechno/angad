@@ -1,12 +1,10 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useCityAnimation } from "../lib/useCityAnimation";
-import { useClock } from "../lib/useClock";
 import { CityChrome } from "./CityChrome";
 import "../city.css";
 
 export default function CityTheme({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { clockStr, dateStr } = useClock();
   const mouseRef = useRef({ x: 0, y: 0 });
 
   useBodyClass("city-page");
@@ -33,7 +31,7 @@ export default function CityTheme({ children }: { children: ReactNode }) {
   return (
     <>
       <canvas ref={canvasRef} className="city-canvas" />
-      <CityChrome clockStr={clockStr} dateStr={dateStr} tier={tier}>{children}</CityChrome>
+      <CityChrome tier={tier}>{children}</CityChrome>
     </>
   );
 }

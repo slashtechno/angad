@@ -3,8 +3,6 @@ import type { ReactNode } from "react";
 import { SITE_LINKS } from "../lib/links";
 
 interface CityChromeProps {
-  clockStr: string;
-  dateStr: string;
   /** Current quality tier from useCityAnimation. >0 means effects were reduced. */
   tier?: 0 | 1 | 2 | 3;
   /** Optional overlay rendered after the chrome (e.g. landing-page scroll/dots/panels) */
@@ -13,7 +11,7 @@ interface CityChromeProps {
   children: ReactNode;
 }
 
-export function CityChrome({ clockStr, dateStr, tier = 0, overlay, children }: CityChromeProps) {
+export function CityChrome({ tier = 0, overlay, children }: CityChromeProps) {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
@@ -42,12 +40,6 @@ export function CityChrome({ clockStr, dateStr, tier = 0, overlay, children }: C
 
       {/* Quality warning (only when tier > 0) */}
       {tier > 0 && <QualityBadge tier={tier} />}
-
-      {/* Bottom-left: clock + date */}
-      <div className="city-ambient">
-        <div className="row"><span className="label">local</span><span>{clockStr}</span></div>
-        <div className="row"><span className="label">date</span><span>{dateStr}</span></div>
-      </div>
 
       {overlay}
 
