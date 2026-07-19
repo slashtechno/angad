@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { lerp, ss } from "../lib/cityScene";
 import { useCityAnimation } from "../lib/useCityAnimation";
-import { useClock } from "../lib/useClock";
 import { EMAIL, SITE_LINKS, SITE_PROJECTS } from "../lib/links";
-import { CityChrome } from "../components/CityChrome";
 import "../city.css";
 
 const camPath = [
@@ -20,7 +18,6 @@ export default function CityLanding() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
   const currentSectionRef = useRef(0);
-  const { clockStr, dateStr } = useClock();
   const [smoothProgress, setSmoothProgress] = useState(0);
   const progressRef = useRef({ target: 0, smooth: 0 });
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -51,7 +48,7 @@ export default function CityLanding() {
   }, []);
 
   // ── Three.js scene ────────────────────────────
-  const { tier } = useCityAnimation({
+  useCityAnimation({
     canvasRef: canvasRef,
     city: {
       fog: 0.012,
@@ -96,86 +93,83 @@ export default function CityLanding() {
   return (
     <>
       <canvas ref={canvasRef} className="city-landing-canvas" />
-      <CityChrome clockStr={clockStr} dateStr={dateStr} tier={tier} overlay={
-        <>
-          {/* Scroll hint */}
-          <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>scroll ↓</div>
 
-          {/* Dots */}
-          <div className="city-dots">
-            {sections.map((_, i) => (
-              <div key={i} className={`city-dot${i === sec ? " active" : ""}`} onClick={() => scrollToSection(i)} />
-            ))}
-          </div>
+      {/* Scroll hint */}
+      <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>scroll ↓</div>
 
-          {/* Section info */}
-          <div className={`city-section-info${sec > 0 ? "" : " hidden"}`}>
-            <div className="city-section-num">{String(sec + 1).padStart(2, "0")}</div>
-            <div className="city-section-title">{sections[sec]}</div>
-          </div>
+      {/* Dots */}
+      <div className="city-dots">
+        {sections.map((_, i) => (
+          <div key={i} className={`city-dot${i === sec ? " active" : ""}`} onClick={() => scrollToSection(i)} />
+        ))}
+      </div>
 
-          {/* Scroll bar */}
-          <div className="city-scroll-bar">
-            <div className="city-scroll-fill" style={{ transform: `scaleX(${smoothProgress})` }} />
-          </div>
-        </>
-      }>
-        {/* Hero */}
-        <div className={`city-hero${sec === 0 ? " visible" : ""}`}>
-          Hi! I'm <span className="city-accent">Angad</span>.
-          <div className="city-hero-sub">High-school student, photographer, and software developer.</div>
-          <div className="city-hero-cta">
-            {SITE_LINKS.map((l, i) => (
-              <span key={l.href}>
-                <a href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>{l.label}</a>
-                {i < SITE_LINKS.length - 1 && <span className="sep">·</span>}
-              </span>
-            ))}
-          </div>
+      {/* Section info */}
+      <div className={`city-section-info${sec > 0 ? "" : " hidden"}`}>
+        <div className="city-section-num">{String(sec + 1).padStart(2, "0")}</div>
+        <div className="city-section-title">{sections[sec]}</div>
+      </div>
+
+      {/* Scroll bar */}
+      <div className="city-scroll-bar">
+        <div className="city-scroll-fill" style={{ transform: `scaleX(${smoothProgress})` }} />
+      </div>
+
+      {/* Hero */}
+      <div className={`city-hero${sec === 0 ? " visible" : ""}`}>
+        Hi! I'm <span className="city-accent">Angad</span>.
+        <div className="city-hero-sub">High-school student, photographer, and software developer.</div>
+        <div className="city-hero-cta">
+          {SITE_LINKS.map((l, i) => (
+            <span key={l.href}>
+              <a href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noopener noreferrer" : undefined}>{l.label}</a>
+              {i < SITE_LINKS.length - 1 && <span className="sep">·</span>}
+            </span>
+          ))}
         </div>
+      </div>
 
-        {/* About */}
-        <div className={`city-panel left${sec === 1 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// About</div>
-          <h2>What I do</h2>
-          <p>I build software, take photos, and write the occasional musing. The software lives on <a href={github.href} target="_blank" rel="noopener noreferrer">GitHub</a>; the photos live on <a href={photography.href} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
-          <p>I joined <a href="https://hackclub.com/" target="_blank" rel="noopener noreferrer">Hack Club</a> in 2024 and spent a stretch contracting on <a href="https://podium.hackclub.com" target="_blank" rel="noopener noreferrer">Podium</a>. Before that, I rode a train across Canada for a hackathon (<a href="https://boreal.hackclub.com/" target="_blank" rel="noopener noreferrer">Boreal</a>).</p>
-        </div>
+      {/* About */}
+      <div className={`city-panel left${sec === 1 ? " visible" : ""}`}>
+        <div className="city-panel-tag">// About</div>
+        <h2>What I do</h2>
+        <p>I build software, take photos, and write the occasional musing. The software lives on <a href={github.href} target="_blank" rel="noopener noreferrer">GitHub</a>; the photos live on <a href={photography.href} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+        <p>I joined <a href="https://hackclub.com/" target="_blank" rel="noopener noreferrer">Hack Club</a> in 2024 and spent a stretch contracting on <a href="https://podium.hackclub.com" target="_blank" rel="noopener noreferrer">Podium</a>. Before that, I rode a train across Canada for a hackathon (<a href="https://boreal.hackclub.com/" target="_blank" rel="noopener noreferrer">Boreal</a>).</p>
+      </div>
 
-        {/* Projects */}
-        <div className={`city-panel right${sec === 2 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// Projects</div>
-          <h2>Recent projects</h2>
-          <p className="city-panel-lead">A few of the things I've built. Most live on GitHub.</p>
-          <ul className="city-projects">
-            {SITE_PROJECTS.map((p) => (
-              <li key={p.href}>
-                <a href={p.href} target="_blank" rel="noopener noreferrer">
-                  <span className="title">{p.name}</span>
-                  <span className="desc">{p.description}</span>
-                  <span className="stars">★ {p.stars}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Projects */}
+      <div className={`city-panel right${sec === 2 ? " visible" : ""}`}>
+        <div className="city-panel-tag">// Projects</div>
+        <h2>Recent projects</h2>
+        <p className="city-panel-lead">A few of the things I've built. Most live on GitHub.</p>
+        <ul className="city-projects">
+          {SITE_PROJECTS.map((p) => (
+            <li key={p.href}>
+              <a href={p.href} target="_blank" rel="noopener noreferrer">
+                <span className="title">{p.name}</span>
+                <span className="desc">{p.description}</span>
+                <span className="stars">★ {p.stars}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        {/* Now */}
-        <div className={`city-panel left${sec === 3 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// Now</div>
-          <h2>What I'm up to</h2>
-          <div className="meta">2026</div>
-          <p>Back to tending the garden. Writing, smaller side projects, learning things I don't have a deadline for.</p>
-          <p>Want to chat? <a href={meeting.href} target="_blank" rel="noopener noreferrer">Schedule a meeting</a> or email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
-        </div>
+      {/* Now */}
+      <div className={`city-panel left${sec === 3 ? " visible" : ""}`}>
+        <div className="city-panel-tag">// Now</div>
+        <h2>What I'm up to</h2>
+        <div className="meta">2026</div>
+        <p>Back to tending the garden. Writing, smaller side projects, learning things I don't have a deadline for.</p>
+        <p>Want to chat? <a href={meeting.href} target="_blank" rel="noopener noreferrer">Schedule a meeting</a> or email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
+      </div>
 
-        {/* End */}
-        <div className={`city-panel center${sec === 4 ? " visible" : ""}`}>
-          <div className="city-panel-tag">// End</div>
-          <h2>Thanks for visiting.</h2>
-          <p><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
-        </div>
-      </CityChrome>
+      {/* End */}
+      <div className={`city-panel center${sec === 4 ? " visible" : ""}`}>
+        <div className="city-panel-tag">// End</div>
+        <h2>Thanks for visiting.</h2>
+        <p><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
+      </div>
     </>
   );
 }
