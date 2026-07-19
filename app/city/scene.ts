@@ -408,8 +408,9 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
     (tl.lights[2].material as THREE.MeshBasicMaterial).color.setHex(cycle === 2 ? 0x00ff44 : 0x003300);
   }
 
-  // Cars — move and obey traffic lights
+  // Cars — move and obey traffic lights + follow the car ahead
   const STOP_DIST = 4; // units before light where cars start braking
+  const FOLLOW_DIST = 3.5; // units behind the car ahead where we start braking
   cars.forEach(c => {
     const dir = c.userData.dir;
     const maxSpeed = c.userData.speed;
@@ -442,6 +443,18 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
           targetSpeed = Math.min(targetSpeed, maxSpeed * 0.3);
         }
       }
+    }
+    // Find the nearest car ahead in the same lane (same dir) and brake if too close
+    let gapAhead = Infinity;
+    for (const other of cars) {
+      if (other === c || other.userData.dir !== dir) continue;
+      const dz = (other.position.z - c.position.z) * dir; // positive if other is ahead
+      if (dz > 0 && dz < gapAhead) gapAhead = dz;
+    }
+    if (gapAhead < FOLLOW_DIST) {
+      // Brake harder the closer we are (full stop at ~car length 2.4)
+      const brake = Math.max(0, 1 - (gapAhead - 2.6) / (FOLLOW_DIST - 2.6));
+      targetSpeed = Math.min(targetSpeed, maxSpeed * (1 - brake));
     }
     // Smoothly approach target speed (simulate acceleration/deceleration)
     c.userData.currentSpeed = c.userData.currentSpeed ?? maxSpeed;
