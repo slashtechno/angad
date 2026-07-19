@@ -1,20 +1,15 @@
 import { About } from "../../components/About/About";
-import type { Route } from "./+types/route";
-import "./home.css";
+import { CityLanding } from "../../city/Landing";
 import LinkList from "~/components/LinkList/LinkList";
+import "./home.css";
 
-// > Since React 19, using the built-in <meta> element is recommended over the use of the route module's meta export. (https://reactrouter.com/start/framework/rou1te-module#meta)
-// export function meta({}: Route.MetaArgs) {
-//   return [
-//     { title: "Angad Behl - Home" },
-//     {
-//       name: "description",
-//       content: "Student, software developer, and photographer.",
-//     },
-//   ];
-// }
+// Flip this to switch between the 3D city and the classic landing page.
+// `true` = city landing (3D scroll-driven), `false` = classic landing (static).
+const USE_CITY_LANDING = true;
 
 export default function Home() {
+  if (USE_CITY_LANDING) return <CityLanding />;
+
   return (
     <div id="homepage">
       <title >Angad Behl - Home</title>

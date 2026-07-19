@@ -9,8 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Footer from "./components/Footer/Footer";
-import Header from "./components/Header/Header";
+import CityTheme from "./city/Theme";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -22,6 +21,10 @@ export const links: Route.LinksFunction = () => [
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap",
   },
 ];
 
@@ -45,13 +48,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <>
-    <Header />
-      <div className="app-container">
+    <CityTheme>
       <Outlet />
-      </div>
-      <Footer />
-    </>
+    </CityTheme>
   );
 }
 
