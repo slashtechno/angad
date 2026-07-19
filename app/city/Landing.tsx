@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { lerp, ss } from "../lib/cityScene";
-import { useCityAnimation } from "../lib/useCityAnimation";
+import * as THREE from "three";
+import { lerp, ss } from "./scene";
+import { useCityAnimation } from "./useAnimation";
 import { EMAIL, SITE_LINKS, SITE_PROJECTS } from "../lib/links";
 import "../city.css";
 
@@ -20,8 +21,7 @@ function formatTime(t: number): string {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
-// ── Component ───────────────────────────────────
-export default function CityLanding() {
+export function CityLanding() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentSection, setCurrentSection] = useState(0);
   const currentSectionRef = useRef(0);

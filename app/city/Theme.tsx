@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { useCityAnimation } from "../lib/useCityAnimation";
-import { CityChrome } from "./CityChrome";
+import { useCityAnimation } from "./useAnimation";
+import { CityChrome } from "./Chrome";
 import "../city.css";
 
 export default function CityTheme({ children }: { children: ReactNode }) {

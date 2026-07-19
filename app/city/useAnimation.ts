@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
-import { createCity, tickCity, disposeCity, type CityHandles } from "./cityScene";
+import { createCity, tickCity, disposeCity, type CityHandles } from "./scene";
 
 export interface CityAnimationOptions {
   /** Ref to the canvas element. The hook resolves it after mount. */
