@@ -187,6 +187,7 @@ export function makeCar(city: THREE.Group, dir: number, laneX: number, startZ: n
   for (const s of [-1, 1]) grp.add(mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshBasicMaterial({ color: 0xffffe0 }), [s * 0.5, 0.5, 1.2]));
   for (const s of [-1, 1]) grp.add(mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshBasicMaterial({ color: 0xff2020 }), [s * 0.5, 0.5, -1.2]));
   grp.position.set(laneX, 0, startZ);
+  if (dir < 0) grp.rotation.y = Math.PI; // face -z so headlights lead, tail lights trail
   grp.userData.dir = dir; grp.userData.speed = 8 + Math.random() * 6;
   city.add(grp);
   return grp;

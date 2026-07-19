@@ -120,6 +120,13 @@ export function CityLanding() {
     <>
       <canvas ref={canvasRef} className="city-landing-canvas" />
 
+      {/* Scroll-snap points — one per section, so touch scrolling lands on a section instead of overshooting */}
+      <div className="city-snap-points">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="city-snap-point" style={{ top: `${i * 100}vh` }} />
+        ))}
+      </div>
+
       {/* Scroll hint */}
       <div className={`city-scroll-hint${sec === 0 ? "" : " hidden"}`}>scroll ↓</div>
 
