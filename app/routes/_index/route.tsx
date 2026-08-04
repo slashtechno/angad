@@ -12,8 +12,6 @@ export default function Home() {
 
   return (
     <div id="homepage">
-      <title >Angad Behl - Home</title>
-      <meta name="description" content="Student, software developer, and photographer." />
       <div id="about">
         <About />
       </div>

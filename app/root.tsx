@@ -26,6 +26,17 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&display=swap",
   },
+  { rel: "icon", href: "/favicon.ico", sizes: "any" },
+];
+
+export const meta: Route.MetaFunction = () => [
+  { title: "Angad Behl" },
+  { name: "description", content: "Student, software developer, and photographer." },
+  { property: "og:title", content: "Angad Behl" },
+  { property: "og:description", content: "Student, software developer, and photographer." },
+  { property: "og:type", content: "website" },
+  { property: "og:url", content: "https://angad.me" },
+  { name: "twitter:card", content: "summary" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
