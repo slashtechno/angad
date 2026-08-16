@@ -20,6 +20,7 @@ body.city-page .app-container {
 /* ── Landing page overrides ─────────────────── */
 body.city-landing {
   min-height: 500vh;
+  min-height: 500dvh; /* dvh accounts for mobile browser chrome show/hide, avoiding scroll-height jumps */
   -ms-overflow-style: none;
   scrollbar-width: none;
   overscroll-behavior-y: none; /* prevent mobile rubber-band bounce past the ends */
@@ -51,6 +52,7 @@ body.city-landing .city-content {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   z-index: 0;
 }
 /* Landing page canvas layers over CityTheme's hidden ambient canvas */
@@ -59,6 +61,7 @@ body.city-landing .city-content {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   z-index: 1;
   pointer-events: none;
 }
@@ -381,18 +384,6 @@ body.city-landing .city-content {
 .city-settings-slider::-moz-range-thumb {
   width: 10px; height: 10px; background: #ff823c; border-radius: 50%; border: none;
 }
-.city-settings-toggle {
-  width: 32px; height: 16px; background: rgba(216, 218, 224, 0.15);
-  border: none; border-radius: 8px; cursor: pointer; position: relative; padding: 0;
-  transition: background 0.15s;
-}
-.city-settings-toggle::after {
-  content: ""; position: absolute; top: 2px; left: 2px;
-  width: 12px; height: 12px; background: #d8dae0; border-radius: 50%;
-  transition: transform 0.15s, background 0.15s;
-}
-.city-settings-toggle.on { background: rgba(255, 130, 60, 0.4); }
-.city-settings-toggle.on::after { transform: translateX(16px); background: #ff823c; }
 
 /* ── Mobile responsive ──────────────────────── */
 @media (max-width: 768px) {
@@ -410,8 +401,9 @@ body.city-landing .city-content {
   /* Landing panels — stack full-width instead of left/right split */
   .city-panel { max-width: calc(100vw - 32px); font-size: 11px; }
   .city-panel.left, .city-panel.right, .city-panel.center {
-    left: 16px; right: 16px; top: auto; bottom: 80px;
+    left: 16px; right: 16px; top: 72px; bottom: 80px;
     transform: none; text-align: left; max-width: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
   }
   .city-panel.left.visible, .city-panel.right.visible, .city-panel.center.visible { transform: none; }
   .city-panel h2 { font-size: 24px; }

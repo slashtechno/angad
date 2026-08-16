@@ -32,7 +32,6 @@ export function CityLanding() {
   // ── Settings panel state ──────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState(0.35); // 0..1 (0=midnight, 0.5=noon)
-  const [alwaysGreen, setAlwaysGreen] = useState(false);
   const [fogDensity, setFogDensity] = useState(0.012);
   const [trafficSpeed, setTrafficSpeed] = useState(1);
   const fogRef = useRef(fogDensity);
@@ -66,7 +65,6 @@ export function CityLanding() {
   useCityAnimation({
     canvasRef: canvasRef,
     controlledTime: timeOfDay,
-    trafficEnabled: !alwaysGreen,
     trafficSpeed: trafficSpeed,
     city: {
       fog: 0.012,
@@ -149,14 +147,6 @@ export function CityLanding() {
                 className="city-settings-slider"
               />
               <span className="city-settings-value">{formatTime(timeOfDay)}</span>
-            </div>
-            <div className="city-settings-row">
-              <label className="city-settings-label">Always green</label>
-              <button
-                className={`city-settings-toggle${alwaysGreen ? " on" : ""}`}
-                onClick={() => setAlwaysGreen(g => !g)}
-                aria-label="Toggle always green"
-              />
             </div>
             <div className="city-settings-row">
               <label className="city-settings-label">Fog</label>
