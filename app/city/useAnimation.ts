@@ -149,6 +149,7 @@ export function useCityAnimation(opts: CityAnimationOptions): { tier: QualityTie
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", onResize);
       disposeCity(handles);
+      delete (window as any).__dbgHandles; // otherwise the disposed scene graph stays reachable from window and never gets GC'd
     };
     // ponytail: deps are canvas ref + canvas size flags; city options & callbacks
     // are read from optsRef so the scene is only created once per mount.
