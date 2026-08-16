@@ -1,20 +1,28 @@
 import * as THREE from "three";
 import { mesh } from "./utils";
-import { carColors, CAR_LENGTH, CAR_HALF_LENGTH, CAR_MIN_GAP, WRAP_AT, CAR_DECEL, CAR_ACCEL, STOP_BUFFER } from "./constants";
-import type { AxisState } from "./constants";
-import { pedestrianHazardDistance } from "./pedestrians";
+import {
+  carColors, CAR_LENGTH, CAR_HALF_LENGTH, CAR_MIN_GAP, CAR_DECEL, CAR_ACCEL,
+  PED_CLEARANCE, INTERSECTION_HALF, STOP_OFFSET, EW_STOP_OFFSET, WRAP_AT,
+} from "./constants";
+import type { SignalPhase } from "./signals";
 import type { CityHandles } from "./scene-types";
 
-// A car's `position` is its center, but every stop-line/follow-distance calculation cares about
-// where its BUMPER is — without this, "stop at the line" and "leave one car length of gap" were
-// both silently measuring from the center, so cars actually stopped/queued half a car length past
-// where they looked like they should (see CAR_LENGTH/CAR_HALF_LENGTH in constants.ts).
+type Axis = "x" | "z";
+const otherAxis = (a: Axis): Axis => (a === "x" ? "z" : "x");
 
-// `axis` is which world axis the car travels along ("z" for the main road, "x" for the cross
-// street). `laneOffset` is the car's fixed coordinate on the OTHER axis, `startPos` its starting
-// coordinate on the travel axis. The model is built facing +z; for axis "x" it's rotated an extra
-// 90° so "forward" (headlights leading) points along +x/-x instead.
-export function makeCar(city: THREE.Group, dir: 1 | -1, laneOffset: number, startPos: number, axis: "x" | "z" = "z") {
+// Forward distance from `from` to `to` along `axis` in direction `dir`, treating the road as a loop
+// of length 2*WRAP_AT[axis] — so a hazard just past the wrap seam still reads as "close ahead".
+function forwardDistance(from: number, to: number, dir: 1 | -1, axis: Axis): number {
+  const loop = 2 * WRAP_AT[axis];
+  const raw = dir * (to - from);
+  return ((raw % loop) + loop) % loop;
+}
+
+// `axis` is the road the car travels along ("z" for the main road, "x" for the cross street).
+// `laneOffset` is the car's fixed coordinate on the OTHER axis, `startPos` its starting coordinate
+// on the travel axis. The model is built facing +z; for axis "x" it's rotated 90° so "forward"
+// (headlights leading) points along +x/-x instead.
+export function makeCar(city: THREE.Group, dir: 1 | -1, laneOffset: number, startPos: number, axis: Axis = "z") {
   const grp = new THREE.Group();
   const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.6, CAR_LENGTH), new THREE.MeshStandardMaterial({ color: carColors[Math.floor(Math.random() * carColors.length)], roughness: 0.4, metalness: 0.6 }));
   body.position.y = 0.45; grp.add(body);
@@ -25,109 +33,90 @@ export function makeCar(city: THREE.Group, dir: 1 | -1, laneOffset: number, star
 
   if (axis === "z") {
     grp.position.set(laneOffset, 0, startPos);
-    if (dir < 0) grp.rotation.y = Math.PI; // face -z so headlights lead, tail lights trail
+    if (dir < 0) grp.rotation.y = Math.PI;
   } else {
     grp.position.set(startPos, 0, laneOffset);
-    grp.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2; // face +x or -x
+    grp.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
   }
   grp.userData.dir = dir; grp.userData.axis = axis; grp.userData.speed = 8 + Math.random() * 6;
-  // Per-car following gap, jittered around CAR_MIN_GAP — without this every car in a queue settles
-  // at the exact same spacing, which reads as mechanically uniform rather than like actual traffic.
   grp.userData.followGap = CAR_MIN_GAP + Math.random() * 1.2;
   city.add(grp);
   return grp;
 }
 
-// ── Motion model ─────────────────────────────────
-// Every car's speed each frame is derived from ONE number: how far away is the nearest thing it
-// must not pass (a red/yellow stop line, the car ahead, a pedestrian in or about to be in its
-// path)? At a comfortable deceleration CAR_DECEL, a car doing v needs v²/(2·CAR_DECEL) to stop —
-// so capping speed at sqrt(2·CAR_DECEL·distance) means it can never need to overshoot and correct,
-// for any obstacle that reports its distance this way. That replaces the old separate
-// "start easing off at threshold X, then hard-clamp position so the easing's lag can't overshoot"
-// pair PER obstacle type (signal / leader / pedestrian) with one formula shared by all three —
-// no clamp functions, no "already past, freeze in place" fallback, no per-obstacle tuning knobs.
-function safeSpeed(maxSpeed: number, distance: number): number {
-  return Math.min(maxSpeed, Math.sqrt(2 * CAR_DECEL * Math.max(0, distance)));
-}
-
-// Distance from this car's front bumper to its stop line, while the light is red or yellow.
-// Infinity (no constraint at all) in three cases: it's green; the car's REAR bumper has cleared
-// the line (already fully through, committed, no longer this line's concern); or the car's FRONT
-// bumper is already past the line the very first frame this constraint applies (the light just
-// turned red/yellow under a car that was already too close to stop for CAR_DECEL) — a genuine
-// dilemma zone where flooring the distance at 0 wouldn't create stopping room that isn't there, it
-// would just park the car straddling its own stop line instead of letting it finish crossing.
-function signalDistance(dir: 1 | -1, axis: "x" | "z", pos: number, trafficLights: CityHandles["trafficLights"], states: AxisState): number {
-  if (states[axis] === "green") return Infinity;
-  const tl = trafficLights.find(t => t.axis === axis && t.dir === dir);
-  if (!tl) return Infinity;
-  const target = tl.pos - dir * STOP_BUFFER;
-  const rearBumper = pos - dir * CAR_HALF_LENGTH;
-  if ((target - rearBumper) * dir <= 0) return Infinity; // whole car already past the line
-  const bumper = pos + dir * CAR_HALF_LENGTH;
-  const d = (target - bumper) * dir;
-  return d >= 0 ? d : Infinity;
-}
-
-// The road is a LOOP (cars wrap from one end to the other, still travelling the same `dir`), not a
-// line — so the raw coordinate difference between two cars is only the real gap between them when
-// they're on the same side of the wrap seam. A car near +95 and one near -95 are actually ~10
-// units apart going the short way around, not ~190 going the long way — without folding the
-// far-apart (long-way) reading back into the near (short-way) one, a car near one end of the road
-// picks a car near the OTHER end as its "leader", miles away in raw terms, and paces against it as
-// if it were directly, closely ahead.
-function wrappedGap(dir: 1 | -1, axis: "x" | "z", pos: number, otherPos: number): number {
-  const trackLen = 2 * WRAP_AT[axis];
-  let gap = (otherPos - pos) * dir;
-  if (gap > trackLen / 2) gap -= trackLen;
-  else if (gap <= -trackLen / 2) gap += trackLen;
-  return gap;
-}
-
-// Distance (center-to-center gap minus this car's own jittered following distance) to the nearest
-// car ahead in the same lane. Infinity if there isn't one.
-function leaderDistance(c: THREE.Group, dir: 1 | -1, axis: "x" | "z", pos: number, cars: THREE.Group[]): number {
-  let bestGap = Infinity;
-  for (const other of cars) {
-    if (other === c || other.userData.dir !== dir || other.userData.axis !== axis) continue;
-    const gap = wrappedGap(dir, axis, pos, other.position[axis]);
-    if (gap > 0 && gap < bestGap) bestGap = gap;
+// ── Motion model ───────────────────────────────
+// Each car's speed is capped so it can stop before the NEAREST thing it must not pass, at a
+// comfortable constant CAR_DECEL: v = sqrt(2·DECEL·distance). Every hazard reports its distance
+// the same way (positive = ahead), so they all share one braking curve. The hazards are:
+//   1. The stop line, when the car's own light is yellow or red (unless already committed past it).
+//   2. The car ahead in the same lane (keep a following gap).
+//   3. Cross traffic already inside the intersection box (a safety net independent of the signal).
+//   4. A pedestrian mid-crossing in a crosswalk on this road.
+export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"], phase: SignalPhase, dt: number): void {
+  // Is any car of the OTHER axis currently inside the intersection's conflict box? One check per
+  // axis per frame — every car sharing that axis asks the same question below.
+  const boxOccupied: Record<Axis, boolean> = { x: false, z: false };
+  for (const c of cars) {
+    const a = c.userData.axis as Axis;
+    if (Math.abs(c.position[a]) < INTERSECTION_HALF) boxOccupied[otherAxis(a)] = true;
   }
-  if (bestGap === Infinity) return Infinity;
-  return bestGap - (c.userData.followGap as number);
-}
 
-export function updateCars(cars: THREE.Group[], trafficLights: CityHandles["trafficLights"], crossers: CityHandles["crossers"], strollers: CityHandles["strollers"], states: AxisState, dt: number): void {
-  cars.forEach(c => {
-    const dir = c.userData.dir as 1 | -1;
-    const axis = c.userData.axis as "x" | "z";
-    const maxSpeed = c.userData.speed;
-    const pos = c.position[axis];
+  for (const car of cars) {
+    const axis = car.userData.axis as Axis;
+    const dir = car.userData.dir as 1 | -1;
+    const maxSpeed = car.userData.speed as number;
+    const pos = car.position[axis];
+    const curSpeed: number = car.userData.curSpeed ?? maxSpeed;
+    const frontBumper = pos + dir * CAR_HALF_LENGTH;
 
-    const stopDistance = Math.min(
-      signalDistance(dir, axis, pos, trafficLights, states),
-      leaderDistance(c, dir, axis, pos, cars),
-      pedestrianHazardDistance(dir, axis, pos, crossers, strollers, states),
-    );
+    // Distance (positive = ahead) to the nearest thing this car must stop before.
+    let stopDist = Infinity;
+    const consider = (d: number) => { if (d < stopDist) stopDist = d; };
 
-    const target = safeSpeed(maxSpeed, stopDistance);
-    const current = c.userData.currentSpeed ?? maxSpeed;
-    // Braking is uncapped (snap straight to `target`): it's already the exact speed CAR_DECEL-safe
-    // for the current distance, so anything slower is unnecessary caution and anything faster is
-    // exactly the overshoot this model exists to avoid. Speeding up off a stop is capped at
-    // CAR_ACCEL so it doesn't look like it's snapping straight to full speed.
-    c.userData.currentSpeed = target < current ? target : Math.min(target, current + CAR_ACCEL * dt);
+    // 1. Stop line — never enter the intersection on yellow or red. A car whose front bumper is
+    // already at/past the line (committed, entered on green) is allowed to finish its crossing.
+    const light = axis === "z" ? phase.nsLight : phase.ewLight;
+    const stopLine = -dir * (axis === "z" ? STOP_OFFSET : EW_STOP_OFFSET);
+    const distToLine = (stopLine - frontBumper) * dir;
+    if (light !== "green" && distToLine > 0) consider(distToLine);
 
-    let nextPos = pos + dir * c.userData.currentSpeed * dt;
-    // Wrap by shifting a full track-length (2*wrapAt), not by mirroring the sign: `dir` is
-    // unchanged across the wrap (this is a loop, a car reappears at the other end still heading
-    // the same way), and sign-flipping only coincidentally approximates that for a hair's-width
-    // overshoot right at the boundary — for anything further out than that it flips back and forth
-    // forever without ever landing back in range.
-    const wrapAt = WRAP_AT[axis];
-    if (nextPos > wrapAt) nextPos -= 2 * wrapAt;
-    else if (nextPos < -wrapAt) nextPos += 2 * wrapAt;
-    c.position[axis] = nextPos;
-  });
+    // 2. Car ahead in the same lane — keep followGap (center-to-center) behind it.
+    for (const other of cars) {
+      if (other === car) continue;
+      if (other.userData.axis !== axis || other.userData.dir !== dir) continue;
+      const gap = forwardDistance(pos, other.position[axis], dir, axis);
+      if (gap > 0) consider(gap - (car.userData.followGap as number));
+    }
+
+    // 3. Cross traffic already inside the intersection box — a hard safety net so a straggling car
+    // from either road can never physically collide with the other. Only while this car is still on
+    // the NEAR side and hasn't entered the box yet (dir*pos < 0 = near side; |pos| >= half = outside).
+    if (dir * pos < 0 && Math.abs(pos) >= INTERSECTION_HALF && boxOccupied[axis]) {
+      consider(((-dir * INTERSECTION_HALF) - frontBumper) * dir);
+    }
+
+    // 4. Pedestrian mid-crossing in a crosswalk on this road — stop short of the crosswalk. Crossers
+    // only cross while this road's light is red (their walk signal), so this is a backstop for a
+    // crosser still finishing when the light turns green — but it guarantees no car ever hits one.
+    for (const p of crossers) {
+      if (p.axis !== otherAxis(axis)) continue; // p crosses THIS car's road
+      if (!p.moving) continue; // waiting at the curb, not in the road
+      consider((p.fixed - dir * PED_CLEARANCE - frontBumper) * dir);
+    }
+
+    // Speed: brake to stop within stopDist. Braking is uncapped (snap straight to the safe speed —
+    // it already encodes CAR_DECEL); accelerating off a stop is capped at CAR_ACCEL.
+    const safe = Math.min(maxSpeed, Math.sqrt(2 * CAR_DECEL * Math.max(0, stopDist)));
+    const next = safe < curSpeed ? safe : Math.min(safe, curSpeed + CAR_ACCEL * dt);
+    car.userData.curSpeed = next;
+
+    let newPos = pos + dir * next * dt;
+    // Clamp so the car's center can never pass its nearest stop point (only when that point is
+    // ahead) — closes the tiny discrete-time overshoot at large dt (e.g. a tab switch).
+    if (stopDist !== Infinity && stopDist > 0 && (pos + dir * stopDist - newPos) * dir < 0) {
+      newPos = pos + dir * stopDist;
+    }
+    if (Math.abs(newPos) > WRAP_AT[axis]) newPos = -newPos;
+    car.position[axis] = newPos;
+  }
 }

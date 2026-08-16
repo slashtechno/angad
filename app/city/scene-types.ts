@@ -10,7 +10,7 @@ export interface CityHandles {
   trafficLights: { lights: THREE.Mesh[]; axis: "x" | "z"; pos: number; dir: 1 | -1 }[];
   walkSigns: THREE.Mesh[];
   crossWalkSigns: THREE.Mesh[];
-  crossers: { grp: THREE.Group; fixed: number; axis: "x" | "z"; gated: boolean; t: number; dir: 1 | -1; moving: boolean; graduated: boolean; strollDir: 1 | -1; strollSpeed: number }[];
+  crossers: { grp: THREE.Group; fixed: number; axis: "x" | "z"; t: number; dir: 1 | -1; moving: boolean }[];
   strollers: { grp: THREE.Group; axis: "x" | "z"; dir: 1 | -1; speed: number }[];
   buildingMats: THREE.MeshStandardMaterial[];
   sun: THREE.DirectionalLight;

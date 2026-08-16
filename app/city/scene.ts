@@ -3,7 +3,7 @@ import { makeWindowTexture } from "./utils";
 import { addBuilding } from "./buildings";
 import { buildRoadway, BUILDING_GAP } from "./roadway";
 import { makeCar, updateCars } from "./cars";
-import { buildTrafficSignals, computeSignalState, computeCrossSignalState, computeNsWalkable, computeEwWalkable, updateSignalHeads, updateWalkSigns } from "./signals";
+import { buildTrafficSignals, computeSignalPhase, updateSignalHeads, updateWalkSigns } from "./signals";
 import { buildCrossers, buildStrollers, updateCrossers, updateStrollers } from "./pedestrians";
 import { updateEnvironment, updateLampsAndSigns } from "./environment";
 import { mulberry32 } from "./utils";
@@ -80,15 +80,24 @@ export function createCity(opts: CityOptions): CityHandles {
     }
   }
 
-  // Cars — main road (NS) plus a smaller flow on the cross street (EW)
+  // Cars — main road (NS) plus a smaller flow on the cross street (EW). Each car spawns on one
+  // side of the intersection, facing toward it, far enough out that it never materializes inside the
+  // intersection or on top of a stop line. Cars on a side are placed at evenly-spaced base positions
+  // (with a little jitter) so two cars never spawn on top of each other.
   const cars: THREE.Group[] = [];
   for (let i = 0; i < 8; i++) {
-    const dir = i % 2 === 0 ? 1 : -1;
-    cars.push(makeCar(city, dir, dir * 3.5, -90 + Math.random() * 180, "z"));
+    const side = i % 2 === 0 ? -1 : 1; // which side of the intersection it starts on
+    const dir = (side === -1 ? 1 : -1) as 1 | -1; // face toward the intersection
+    const idx = Math.floor(i / 2); // 0..3 per side
+    const start = side * (10 + idx * 20 + Math.random() * 5);
+    cars.push(makeCar(city, dir, dir * 3.5, start, "z"));
   }
   for (let i = 0; i < 4; i++) {
-    const dir = i % 2 === 0 ? 1 : -1;
-    cars.push(makeCar(city, dir, dir > 0 ? -EW_LANE : EW_LANE, -35 + Math.random() * 70, "x"));
+    const side = i % 2 === 0 ? -1 : 1;
+    const dir = (side === -1 ? 1 : -1) as 1 | -1;
+    const idx = Math.floor(i / 2); // 0..1 per side
+    const start = side * (20 + idx * 15 + Math.random() * 3);
+    cars.push(makeCar(city, dir, dir > 0 ? -EW_LANE : EW_LANE, start, "x"));
   }
 
   // Streetlamps
@@ -159,20 +168,16 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
   const dark = updateEnvironment(handles, time);
   updateLampsAndSigns(handles, t, dark);
 
-  const nsState = computeSignalState(trafficPhase);
-  const ewState = computeCrossSignalState(trafficPhase);
-  const nsWalkable = computeNsWalkable(trafficPhase);
-  const ewWalkable = computeEwWalkable(trafficPhase);
+  const phase = computeSignalPhase(trafficPhase);
   const { ns, ew } = getTrafficLightsByAxis(handles);
-  updateSignalHeads(ns, nsState);
-  updateSignalHeads(ew, ewState);
-  updateWalkSigns(handles.walkSigns, nsWalkable);
-  updateWalkSigns(handles.crossWalkSigns, ewWalkable);
-  updateCrossers(handles.crossers, nsWalkable, ewWalkable, dt);
+  updateSignalHeads(ns, phase.nsLight);
+  updateSignalHeads(ew, phase.ewLight);
+  updateWalkSigns(handles.walkSigns, phase.nsWalk);
+  updateWalkSigns(handles.crossWalkSigns, phase.ewWalk);
+  updateCrossers(handles.crossers, phase, dt);
   updateStrollers(handles.strollers, dt);
 
-  const states = { z: nsState, x: ewState };
-  updateCars(handles.cars, handles.trafficLights, handles.crossers, handles.strollers, states, dt);
+  updateCars(handles.cars, handles.crossers, phase, dt);
 
   return { dark };
 }
