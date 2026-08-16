@@ -398,24 +398,18 @@ body.city-landing .city-content {
   /* Landing hero — don't overflow on small screens */
   .city-hero { font-size: 40px; left: 16px; right: 16px; bottom: 100px; }
   .city-hero-sub { font-size: 12px; }
-  /* On mobile, panels sit in-document at their section offsets (via absolute
-     positioning) so the page scrolls naturally — no internal scroll capturing.
-     Bump canvas z-index so it stays below the panels (z:45). */
+  /* Mobile: fixed panels anchored to the bottom of the viewport (bottom:80px),
+     no top constraint, no internal scroll — page scrolls through them naturally.
+     position:fixed (not absolute) so the canvas (z:0) stays behind panels (z:45).
+     No overflow-y:auto so the panel never captures scroll gestures. */
   body.city-landing { position: relative; }
   html:has(body.city-landing) { scroll-snap-type: none; }
-  .city-canvas { z-index: 0; }
-  .city-landing-canvas { z-index: 0; }
   .city-panel.left, .city-panel.right, .city-panel.center {
-    position: absolute; left: 16px; right: 16px;
+    position: fixed; left: 16px; right: 16px; top: auto; bottom: 80px;
     transform: none; text-align: left; max-width: none;
-    /* Hidden by default; .visible sets opacity:1 and pointer-events:auto */
+    /* Hidden by default; Landing.tsx adds .visible to show the active one */
     opacity: 0; pointer-events: none;
   }
-  /* Each panel anchors to its section scroll position. */
-  .city-panel.left  { top: calc(100vh + 80px); } /* About  */
-  .city-panel.right { top: calc(200vh + 80px); } /* Projects */
-  .city-panel.left.city-panel { top: calc(300vh + 80px); } /* Now: .left + .right — beats .left */
-  .city-panel.center { top: calc(400vh + 80px); } /* End */
   .city-panel.visible { opacity: 1; pointer-events: auto; }
   .city-panel.left.visible, .city-panel.right.visible, .city-panel.center.visible { transform: none; }
   .city-panel h2 { font-size: 24px; }
