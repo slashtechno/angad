@@ -398,13 +398,25 @@ body.city-landing .city-content {
   /* Landing hero — don't overflow on small screens */
   .city-hero { font-size: 40px; left: 16px; right: 16px; bottom: 100px; }
   .city-hero-sub { font-size: 12px; }
-  /* Landing panels — stack full-width instead of left/right split */
-  .city-panel { max-width: calc(100vw - 32px); font-size: 11px; }
+  /* On mobile, panels sit in-document at their section offsets (via absolute
+     positioning) so the page scrolls naturally — no internal scroll capturing.
+     Bump canvas z-index so it stays below the panels (z:45). */
+  body.city-landing { position: relative; }
+  html:has(body.city-landing) { scroll-snap-type: none; }
+  .city-canvas { z-index: 0; }
+  .city-landing-canvas { z-index: 0; }
   .city-panel.left, .city-panel.right, .city-panel.center {
-    left: 16px; right: 16px; top: 72px; bottom: 80px;
+    position: absolute; left: 16px; right: 16px;
     transform: none; text-align: left; max-width: none;
-    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    /* Hidden by default; .visible sets opacity:1 and pointer-events:auto */
+    opacity: 0; pointer-events: none;
   }
+  /* Each panel anchors to its section scroll position. */
+  .city-panel.left  { top: calc(100vh + 80px); } /* About  */
+  .city-panel.right { top: calc(200vh + 80px); } /* Projects */
+  .city-panel.left.city-panel { top: calc(300vh + 80px); } /* Now: .left + .right — beats .left */
+  .city-panel.center { top: calc(400vh + 80px); } /* End */
+  .city-panel.visible { opacity: 1; pointer-events: auto; }
   .city-panel.left.visible, .city-panel.right.visible, .city-panel.center.visible { transform: none; }
   .city-panel h2 { font-size: 24px; }
   .city-panel h3 { font-size: 18px; }
