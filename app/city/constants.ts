@@ -22,6 +22,17 @@ export const CAR_HALF_LENGTH = CAR_LENGTH / 2;
 // baseline every car's own followGap (see makeCar) jitters around.
 export const CAR_MIN_GAP = CAR_LENGTH + 0.6;
 
+// ── Motion model ─────────────────────────────────
+// A car's speed is derived from distance-to-obstacle, not tuned separately per obstacle type: at
+// a comfortable deceleration CAR_DECEL, a car doing v can stop within v²/(2·CAR_DECEL) — so capping
+// speed at sqrt(2·CAR_DECEL·distanceRemaining) guarantees it never needs to overshoot and correct,
+// for any obstacle (signal, leading car, pedestrian) that reports its distance the same way.
+export const CAR_DECEL = 12; // comfortable braking deceleration, units/s²
+export const CAR_ACCEL = 6; // comfortable acceleration off a stop, units/s² (braking itself is uncapped — safeSpeed already encodes CAR_DECEL, so snapping straight to it IS the correct deceleration)
+// Small visible clearance a car keeps beyond the geometric edge of whatever it's stopping short of
+// (a stop line, a pedestrian's body) — purely cosmetic, so bumpers don't appear to touch.
+export const STOP_BUFFER = 0.15;
+
 // ── Intersection geometry ───────────────────────
 // The one real intersection's layout, defined once and shared between scene construction
 // (createCity) and the simulation (tickCity) — crosswalk stripes, stop lines, and pedestrian
@@ -62,6 +73,13 @@ export const SIGNAL_RED_S = 9;
 export const SIGNAL_CYCLE_S = SIGNAL_GREEN_S + SIGNAL_YELLOW_S + SIGNAL_RED_S;
 export const NS_RED_START_S = SIGNAL_GREEN_S + SIGNAL_YELLOW_S; // NS red (== EW green start) begins here
 export const EW_GREEN_S = SIGNAL_RED_S - SIGNAL_YELLOW_S; // fills NS's red window, minus EW's own yellow
+// All-red pedestrian clearance: the walk signal doesn't go live the instant a light turns red —
+// real intersections hold BOTH directions red for a beat first, specifically so a car that was
+// already committed past its own stop line when its light turned red (see signalDistance's
+// "cleared" case in cars.ts) has time to physically clear the crosswalk before a pedestrian ever
+// steps into it. Without this gap, "light just turned red" and "pedestrian may now step out" are
+// the same instant, and a car that's still mid-crosswalk at that instant has had zero warning.
+export const PED_CLEARANCE_S = 1.5;
 export const PED_CROSS_SPEED_NS = 1 / 7; // fraction/s for the ~22-unit NS crossing — 7s, comfortably under SIGNAL_RED_S
 export const PED_CROSS_SPEED_EW = 1 / 3; // fraction/s for the shorter ~9-unit EW crossing — 3s, comfortably under NS_RED_START_S
 export type SignalState = "red" | "yellow" | "green";

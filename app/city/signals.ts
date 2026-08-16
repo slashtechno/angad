@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mesh } from "./utils";
-import { EW_LANE, EW_STOP_OFFSET, STOP_OFFSET, EW_CROSSWALK_X, INTERSECTION_HALF, SIGNAL_GREEN_S, SIGNAL_YELLOW_S, SIGNAL_CYCLE_S, NS_RED_START_S, EW_GREEN_S } from "./constants";
+import { EW_LANE, EW_STOP_OFFSET, STOP_OFFSET, EW_CROSSWALK_X, INTERSECTION_HALF, SIGNAL_GREEN_S, SIGNAL_YELLOW_S, SIGNAL_CYCLE_S, NS_RED_START_S, EW_GREEN_S, PED_CLEARANCE_S } from "./constants";
 import type { SignalState } from "./constants";
 import type { CityHandles } from "./scene-types";
 
@@ -16,6 +16,20 @@ export function computeCrossSignalState(trafficPhase: number): SignalState {
   if (s < NS_RED_START_S) return "red";
   if (s < NS_RED_START_S + EW_GREEN_S) return "green";
   return "yellow";
+}
+
+// A crosswalk is walkable only after its road's light has been red for PED_CLEARANCE_S — see
+// PED_CLEARANCE_S in constants.ts for why. Computed straight from `trafficPhase`, not from the
+// SignalState enum, since "red" alone can't distinguish the instant red began from partway through
+// the red window.
+export function computeNsWalkable(trafficPhase: number): boolean {
+  const s = trafficPhase % SIGNAL_CYCLE_S;
+  return s >= NS_RED_START_S + PED_CLEARANCE_S;
+}
+
+export function computeEwWalkable(trafficPhase: number): boolean {
+  const s = trafficPhase % SIGNAL_CYCLE_S;
+  return s >= PED_CLEARANCE_S && s < NS_RED_START_S;
 }
 
 export function updateSignalHeads(trafficLights: CityHandles["trafficLights"], state: SignalState): void {

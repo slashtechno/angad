@@ -3,11 +3,12 @@ import { lerp } from "./utils";
 import {
   INTERSECTION_HALF, EW_CROSSWALK_X, MAIN_SIDEWALK_X, CROSS_SIDEWALK_Z, CROSS_SIDEWALK_FAR,
   MAIN_SIDEWALK_OUTER, SIDEWALK_WIDTH, NS_CROSSWALK_SPAN, EW_CROSSWALK_SPAN, WRAP_AT,
-  PED_CROSS_SPEED_NS, PED_CROSS_SPEED_EW, CROSSWALK_HALF_LEN,
+  PED_CROSS_SPEED_NS, PED_CROSS_SPEED_EW, CROSSWALK_HALF_LEN, CAR_HALF_LENGTH, STOP_BUFFER,
 } from "./constants";
+import type { AxisState } from "./constants";
 
 // Rough pedestrian body clearance, when a stroller is a car hazard outside any marked crosswalk
-// (see strollerStopAhead) — not CROSSWALK_HALF_LEN, since that's specifically about painted
+// (see pedestrianHazardDistance) — not CROSSWALK_HALF_LEN, since that's specifically about painted
 // crosswalk width, which doesn't apply here.
 const STROLLER_HAZARD_HALF_WIDTH = 0.5;
 import type { CityHandles } from "./scene-types";
@@ -76,7 +77,7 @@ export function buildStrollers(city: THREE.Group): CityHandles["strollers"] {
   for (let i = 0; i < 8; i++) {
     const side = i % 2 === 0 ? -1 : 1;
     // Avoid spawning inside the intersection's curb-cut gap (|z| < INTERSECTION_HALF) — a stroller
-    // is protected there once actually simulating (see strollerStopAhead in cars.ts), but
+    // is protected there once actually simulating (see pedestrianHazardDistance below), but
     // materializing already inside it on load reads as popping into traffic rather than walking there.
     const segSign = Math.random() < 0.5 ? 1 : -1;
     const along = segSign * lerp(INTERSECTION_HALF, WRAP_AT.z - STROLLER_MARGIN, Math.random());
@@ -204,45 +205,66 @@ export function updateStrollers(strollers: CityHandles["strollers"], dt: number)
   });
 }
 
-// A pedestrian's danger zone is a BAND (their body/crosswalk width), not a single point a car either
-// hasn't reached or has cleanly passed — and a car's own position at the instant a pedestrian
-// becomes a hazard (a crosser starting to cross, or a stroller walking into an unprotected road
-// gap) can already be anywhere inside that band, not just short of its near edge. Treating
-// "gap > 0" (not yet at the near edge) as the only dangerous case — as an earlier version did —
-// silently ignores a car already inside the band, which then drives straight through/past the
-// pedestrian with zero braking. So a car is a hazard candidate as long as it hasn't cleared the FAR
-// edge yet, and its stop target is the near edge — unless it's already past that too, in which case
-// it must hold at its current position (a car can't retreat back out of a band it's already entered).
-export function hazardStopPoint(dir: 1 | -1, pos: number, hazardPos: number, halfWidth: number): number | null {
-  const nearEdge = hazardPos - dir * halfWidth;
+// A car never needs to react to a pedestrian it's already braking for on general safe-following
+// principles — it needs a DISTANCE to the nearest one it might hit, in the same units/frame as the
+// signal and leader distances in cars.ts, so all three can be combined with a plain `Math.min` and
+// fed through one speed-from-distance formula. No separate "already inside, hold in place" case:
+// since the distance below is measured to the car's own FRONT BUMPER (not its center) and clamped
+// to zero rather than going negative, `safeSpeed(0) === 0` already means "stop here", covering that
+// case for free.
+const CAR_CLEARANCE = CAR_HALF_LENGTH + STOP_BUFFER;
+
+// Distance from this car's front bumper to the near edge of a pedestrian-shaped hazard band
+// centered at `hazardPos` (the hazard's coordinate on the CAR's own travel axis). `null` — no
+// braking constraint — once EITHER the car's rear bumper has cleared the hazard's own (un-padded)
+// far edge, OR its front bumper is already past the near edge by the time this hazard is first
+// seen. That second case is a genuine dilemma zone: the hazard just went live (a light just turned
+// non-green) on a car that was already too close to stop for CAR_DECEL at its current speed —
+// exactly the situation PED_CLEARANCE_S exists to make safe, by holding the actual pedestrian back
+// long enough for this car to clear. The alternative — flooring the distance at 0 and braking hard
+// anyway — doesn't retroactively create stopping room; it just parks the car mid-hazard, which
+// looks like it stalled in the middle of the crosswalk instead of completing the crossing it was
+// already committed to.
+function hazardDistance(dir: 1 | -1, pos: number, hazardPos: number, halfWidth: number): number | null {
+  const rearBumper = pos - dir * CAR_HALF_LENGTH;
   const farEdge = hazardPos + dir * halfWidth;
-  const clearedBand = (farEdge - pos) * dir <= 0;
-  if (clearedBand) return null;
-  const pastNearEdge = (nearEdge - pos) * dir <= 0;
-  return pastNearEdge ? pos : nearEdge;
+  if ((farEdge - rearBumper) * dir <= 0) return null; // cleared
+  const bumper = pos + dir * CAR_HALF_LENGTH;
+  const nearEdge = hazardPos - dir * (halfWidth + CAR_CLEARANCE);
+  const d = (nearEdge - bumper) * dir;
+  return d >= 0 ? d : null; // already past the near edge when first detected — can't stop, so don't try; just finish clearing it
 }
 
-export function nearestStop(dir: 1 | -1, a: number | null, b: number | null): number | null {
-  if (a === null) return b;
-  if (b === null) return a;
-  return (a - b) * dir < 0 ? a : b; // whichever requires stopping sooner
-}
-
-// A pedestrian actively crossing the PERPENDICULAR crosswalk is a real obstacle to a car, exactly
-// like the car ahead of it — and unlike the traffic-light checks in cars.ts, this applies
-// regardless of signal state. That matters because a car that already passed its own stop line
-// before the light turned red is otherwise ungoverned by anything: without this, that car sails
-// straight through a crosswalk someone's actually standing on.
-// `p.fixed` is the crosswalk's coordinate on the car's travel axis; braking targets the near edge
-// of the zebra-stripe band, not the crosswalk's centerline, so the car stops clear of it entirely.
-export function pedestrianStopAhead(dir: 1 | -1, axis: "x" | "z", pos: number, crossers: CityHandles["crossers"]): number | null {
-  let stopAt: number | null = null;
+// A pedestrian using the PERPENDICULAR crosswalk is a real obstacle to a car, exactly like the car
+// ahead of it. Primarily driven by the SIGNAL, not by any individual pedestrian's position or
+// timer: a crosser's own walk window is already exactly "my governing state isn't green" (see
+// updateCrossers' `walkable`), so a car can know a crosswalk might be in use as far in advance as
+// it knows its own light isn't green — including a car already past its OWN (now-red) stop line,
+// which signalDistance stops governing entirely the instant it's fully across (see its "cleared"
+// case). Without this, THAT car — the one case a real crosswalk-yield is actually needed for — has
+// nothing left watching for a pedestrian at all. `|| p.moving` is a backstop for the rare case a
+// crossing runs long enough to still be finishing after the light's already cycled back to green —
+// "still physically on the crosswalk" always counts as a hazard, signal timing aside.
+function crosserDistance(dir: 1 | -1, axis: "x" | "z", pos: number, crossers: CityHandles["crossers"], states: AxisState): number {
+  let best = Infinity;
   for (const p of crossers) {
-    if (p.axis === axis || !p.moving) continue; // p.axis is the pedestrian's OWN walking axis — a crosser walking axis "x" crosses (is an obstacle to) axis "z" cars, and vice versa
-    stopAt = nearestStop(dir, stopAt, hazardStopPoint(dir, pos, p.fixed, CROSSWALK_HALF_LEN));
+    if (p.axis === axis) continue; // p.axis is the pedestrian's OWN walking axis — a crosser walking axis "x" crosses (is an obstacle to) axis "z" cars, and vice versa
+    const governingAxis = p.axis === "x" ? "z" : "x"; // NS crossers (axis "x") gate on the NS state (z); EW crossers (axis "z") gate on the EW state (x)
+    if (states[governingAxis] === "green" && !p.moving) continue;
+    const d = hazardDistance(dir, pos, p.fixed, CROSSWALK_HALF_LEN);
+    if (d !== null && d < best) best = d;
   }
-  return stopAt;
+  return best;
 }
+
+// How far ahead (in seconds) a stroller's straight-line walk is projected, so an EW car sees one
+// about to step off the curb into the cross street's curb-cut gap BEFORE it's actually there —
+// same idea as braking for a traffic light that's still green but about to turn, applied to a
+// pedestrian instead of a signal. Generous relative to how long a stroller actually takes to cross
+// the ~8-unit gap (5-9s at their walking speed): plenty of lead time, and harmless even when
+// over-generous, since `safeSpeed` only ever slows a car once it's within its own physics-derived
+// stopping distance regardless of how early the hazard itself became "live".
+const STROLLER_LOOKAHEAD_S = 3;
 
 // Main-road (NS) strollers walk straight through the intersection's curb-cut gap (there's no
 // sidewalk mesh there — see buildRoadway's "split fore/aft of the intersection" sidewalks) at
@@ -251,16 +273,20 @@ export function pedestrianStopAhead(dir: 1 | -1, axis: "x" | "z", pos: number, c
 // at all, so without this an EW car has zero reason to ever brake for one — it drives straight
 // through. EW strollers never need the equivalent check: they're confined to their own sidewalk
 // segments (see updateStrollers) and never enter the main road's band.
-export function strollerStopAhead(dir: 1 | -1, axis: "x" | "z", pos: number, strollers: CityHandles["strollers"]): number | null {
-  if (axis !== "x") return null;
-  let stopAt: number | null = null;
+function strollerDistance(dir: 1 | -1, axis: "x" | "z", pos: number, strollers: CityHandles["strollers"]): number {
+  if (axis !== "x") return Infinity;
+  let best = Infinity;
   for (const p of strollers) {
-    if (p.axis !== "z" || Math.abs(p.grp.position.z) >= INTERSECTION_HALF) continue; // only a hazard while actually inside the cross street's paved band
-    stopAt = nearestStop(dir, stopAt, hazardStopPoint(dir, pos, p.grp.position.x, STROLLER_HAZARD_HALF_WIDTH));
+    if (p.axis !== "z") continue;
+    const projectedZ = p.grp.position.z + p.dir * p.speed * STROLLER_LOOKAHEAD_S;
+    // Neither where they are now nor where they're about to be puts them in the road: not a hazard.
+    if (Math.abs(p.grp.position.z) >= INTERSECTION_HALF && Math.abs(projectedZ) >= INTERSECTION_HALF) continue;
+    const d = hazardDistance(dir, pos, p.grp.position.x, STROLLER_HAZARD_HALF_WIDTH);
+    if (d !== null && d < best) best = d;
   }
-  return stopAt;
+  return best;
 }
 
-export function pedestrianHazardStop(dir: 1 | -1, axis: "x" | "z", pos: number, crossers: CityHandles["crossers"], strollers: CityHandles["strollers"]): number | null {
-  return nearestStop(dir, pedestrianStopAhead(dir, axis, pos, crossers), strollerStopAhead(dir, axis, pos, strollers));
+export function pedestrianHazardDistance(dir: 1 | -1, axis: "x" | "z", pos: number, crossers: CityHandles["crossers"], strollers: CityHandles["strollers"], states: AxisState): number {
+  return Math.min(crosserDistance(dir, axis, pos, crossers, states), strollerDistance(dir, axis, pos, strollers));
 }

@@ -3,7 +3,7 @@ import { makeWindowTexture } from "./utils";
 import { addBuilding } from "./buildings";
 import { buildRoadway, BUILDING_GAP } from "./roadway";
 import { makeCar, updateCars } from "./cars";
-import { buildTrafficSignals, computeSignalState, computeCrossSignalState, updateSignalHeads, updateWalkSigns } from "./signals";
+import { buildTrafficSignals, computeSignalState, computeCrossSignalState, computeNsWalkable, computeEwWalkable, updateSignalHeads, updateWalkSigns } from "./signals";
 import { buildCrossers, buildStrollers, updateCrossers, updateStrollers } from "./pedestrians";
 import { updateEnvironment, updateLampsAndSigns } from "./environment";
 import { mulberry32 } from "./utils";
@@ -161,8 +161,8 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
 
   const nsState = computeSignalState(trafficPhase);
   const ewState = computeCrossSignalState(trafficPhase);
-  const nsWalkable = nsState === "red";
-  const ewWalkable = ewState === "red";
+  const nsWalkable = computeNsWalkable(trafficPhase);
+  const ewWalkable = computeEwWalkable(trafficPhase);
   const { ns, ew } = getTrafficLightsByAxis(handles);
   updateSignalHeads(ns, nsState);
   updateSignalHeads(ew, ewState);
