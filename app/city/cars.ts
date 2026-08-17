@@ -6,6 +6,7 @@ import {
 } from "./constants";
 import type { SignalPhase } from "./signals";
 import type { CityHandles } from "./scene-types";
+import { getCrossingPeds } from "./pedestrians";
 
 type Axis = "x" | "z";
 const otherAxis = (a: Axis): Axis => (a === "x" ? "z" : "x");
@@ -52,7 +53,7 @@ export function makeCar(city: THREE.Group, dir: 1 | -1, laneOffset: number, star
 //   2. The car ahead in the same lane (keep a following gap).
 //   3. Cross traffic already inside the intersection box (a safety net independent of the signal).
 //   4. A pedestrian mid-crossing in a crosswalk on this road.
-export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"], phase: SignalPhase, dt: number): void {
+export function updateCars(cars: THREE.Group[], walkers: CityHandles["walkers"], phase: SignalPhase, dt: number): void {
   // Is any car of the OTHER axis currently inside the intersection's conflict box? One check per
   // axis per frame — every car sharing that axis asks the same question below.
   const boxOccupied: Record<Axis, boolean> = { x: false, z: false };
@@ -60,6 +61,7 @@ export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"
     const a = c.userData.axis as Axis;
     if (Math.abs(c.position[a]) < INTERSECTION_HALF) boxOccupied[otherAxis(a)] = true;
   }
+  const crossingPeds = getCrossingPeds(walkers);
 
   for (const car of cars) {
     const axis = car.userData.axis as Axis;
@@ -97,10 +99,10 @@ export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"
       consider(((-dir * INTERSECTION_HALF) - frontBumper) * dir);
     }
 
-    // 4. Pedestrian mid-crossing in a crosswalk on this road — stop short of the crosswalk. Crossers
+    // 4. Pedestrian mid-crossing in a crosswalk on this road — stop short of the crosswalk. Walkers
     // only cross while this road's light is red (their walk signal), so this is a backstop for a
-    // crosser still finishing when the light turns green — but it guarantees no car ever hits one.
-    for (const p of crossers) {
+    // walker still finishing when the light turns green — but it guarantees no car ever hits one.
+    for (const p of crossingPeds) {
       if (p.axis !== otherAxis(axis)) continue; // p crosses THIS car's road
       if (!p.moving) continue; // waiting at the curb, not in the road
       consider((p.fixed - dir * PED_CLEARANCE - frontBumper) * dir);

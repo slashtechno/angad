@@ -86,7 +86,7 @@ export function buildRoadway(city: THREE.Group): { roadMat: THREE.MeshStandardMa
   }
 
   // Crosswalks — all four sides of the intersection, each connecting adjacent sidewalk segments.
-  // Bars span ±NS_CROSSWALK_SPAN / ±EW_CROSSWALK_SPAN — the SAME extents updateCrossers (in
+  // Bars span ±NS_CROSSWALK_SPAN / ±EW_CROSSWALK_SPAN — the SAME extents updateWalkers (in
   // pedestrians.ts) walks pedestrians across, so the stripes and the footpath can't drift apart
   // the way independently-picked numbers would (which is exactly how they drifted apart before).
   // Bar count/stride: stride evenly divides the span so bars land flush at both edges instead of

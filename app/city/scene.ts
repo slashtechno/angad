@@ -4,7 +4,7 @@ import { addBuilding } from "./buildings";
 import { buildRoadway, BUILDING_GAP } from "./roadway";
 import { makeCar, updateCars } from "./cars";
 import { buildTrafficSignals, computeSignalPhase, updateSignalHeads, updateWalkSigns } from "./signals";
-import { buildCrossers, buildStrollers, updateCrossers, updateStrollers } from "./pedestrians";
+import { buildWalkers, updateWalkers } from "./pedestrians";
 import { updateEnvironment, updateLampsAndSigns } from "./environment";
 import { mulberry32 } from "./utils";
 import { signColors, EW_LANE, MAIN_SIDEWALK_INNER } from "./constants";
@@ -117,9 +117,8 @@ export function createCity(opts: CityOptions): CityHandles {
   // Traffic signals + pedestrian walk signs (main road + cross street)
   const { trafficLights, walkSigns, crossWalkSigns } = buildTrafficSignals(city, MAIN_SIDEWALK_INNER, 3.5);
 
-  // Pedestrians — dedicated crosswalk crossers plus sidewalk strollers
-  const crossers = buildCrossers(city);
-  const strollers = buildStrollers(city);
+  // Pedestrians — sidewalk walkers (spawn where cars do, cross/continue at the intersection).
+  const walkers = buildWalkers(city);
 
   // Neon signs
   const signs: { mesh: THREE.Mesh; light: THREE.PointLight | null; color: number }[] = [];
@@ -144,7 +143,7 @@ export function createCity(opts: CityOptions): CityHandles {
   return {
     scene, camera, renderer,
     lamps, signs, cars,
-    trafficLights, walkSigns, crossWalkSigns, crossers, strollers,
+    trafficLights, walkSigns, crossWalkSigns, walkers,
     buildingMats, sun, ambient, roadMat,
   };
 }
@@ -174,10 +173,9 @@ export function tickCity(handles: CityHandles, t: number, dt: number, trafficPha
   updateSignalHeads(ew, phase.ewLight);
   updateWalkSigns(handles.walkSigns, phase.nsWalk);
   updateWalkSigns(handles.crossWalkSigns, phase.ewWalk);
-  updateCrossers(handles.crossers, phase, dt);
-  updateStrollers(handles.strollers, dt);
+  updateWalkers(handles.walkers, phase, dt);
 
-  updateCars(handles.cars, handles.crossers, phase, dt);
+  updateCars(handles.cars, handles.walkers, phase, dt);
 
   return { dark };
 }

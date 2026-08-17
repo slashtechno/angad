@@ -1,12 +1,10 @@
 import * as THREE from "three";
 import { lerp } from "./utils";
 import {
-  INTERSECTION_HALF, EW_CROSSWALK_X, MAIN_SIDEWALK_X, CROSS_SIDEWALK_Z, CROSS_SIDEWALK_FAR,
-  MAIN_SIDEWALK_OUTER, SIDEWALK_WIDTH, NS_CROSSWALK_SPAN, EW_CROSSWALK_SPAN, WRAP_AT,
-  PED_CROSS_SPEED_NS, PED_CROSS_SPEED_EW, PED_DEPARTURE_MARGIN_S,
+  INTERSECTION_HALF, EW_CROSSWALK_X, CROSS_SIDEWALK_Z, CROSS_SIDEWALK_FAR, WRAP_AT, PED_DEPARTURE_MARGIN_S,
 } from "./constants";
 import type { SignalPhase } from "./signals";
-import type { CityHandles } from "./scene-types";
+import type { Walker, WalkerLeg } from "./scene-types";
 
 type Axis = "x" | "z";
 const otherAxis = (a: Axis): Axis => (a === "x" ? "z" : "x");
@@ -39,96 +37,197 @@ export function makePedestrian(city: THREE.Group): THREE.Group {
   return grp;
 }
 
-// ── Crossers (follow pedestrian signals) ────────
-// A crosser walks along `axis` across the road that runs along `otherAxis(axis)`, pinned at `fixed`
-// on the perpendicular axis (the crosswalk's location). `t` is normalized progress across the
-// crosswalk (0 = one curb, 1 = the other), moving in direction `dir`.
-//   - NS crossers (axis "x") cross the main road at z = ±INTERSECTION_HALF, gated by the NS walk signal.
-//   - EW crossers (axis "z") cross the cross street at x = ±EW_CROSSWALK_X, gated by the EW walk signal.
-// A crosser may only leave the curb while its walk signal is on AND enough of the walk window remains
-// to finish (see PED_DEPARTURE_MARGIN_S); once moving it always finishes the crossing, then turns
-// around and waits for the next walk window to cross back.
-export function buildCrossers(city: THREE.Group): CityHandles["crossers"] {
+// ── Walkers (spawn on sidewalks, cross or continue at the intersection) ────────
+// Each walker spawns out of view on a sidewalk (where the cars spawn), walks toward the intersection,
+// and there makes a one-time choice:
+//   - STRAIGHT: keep walking in the same direction, across the intersection and off-screen.
+//   - TURN:     turn onto the perpendicular sidewalk / crosswalk, then continue off-screen.
+// A walker can come in on either road: a main-road (z-axis) walker on a main sidewalk, or a
+// cross-street (x-axis) walker on a cross-street sidewalk — so pedestrians are visible moving both
+// up/down the screen (main road) and left/right (cross street).
+// Because a walker always exits off-screen and never reverses, no pedestrian shuttles back and forth
+// on the same crosswalk (the old behaviour that looked like pacing). A walker only enters its
+// crosswalk while the corresponding walk signal is on AND enough of the window remains to finish
+// (see PED_DEPARTURE_MARGIN_S); once committed it always finishes, then continues to its exit.
+const WALKER_Z_COUNT = 12; // main-road walkers (move along z)
+const WALKER_X_COUNT = 12; // cross-street walkers (move along x)
+const WALKER_TURN_CHANCE = 0.5;
+const WALKER_SIDEWALK_SPEED = 1.3;
+const WALKER_CROSS_SPEED = 2.6;
+const WALKER_EXIT_MARGIN = 5; // walk this far beyond the sidewalk edge to be safely off-screen
+
+// Which walk signal gates entering `leg`, or null if it's a plain sidewalk run.
+function legNeedsWalk(leg: WalkerLeg): "ns" | "ew" | null {
+  if (!leg.crosswalk) return null;
+  return leg.axis === "x" ? "ns" : "ew"; // axis x crosses the main road (NS), axis z crosses the cross street (EW)
+}
+
+// Build the leg list for one walker and its starting (x, z) position.
+// `axis` picks which road it approaches on: "z" = main road (main sidewalk), "x" = cross street
+// (cross-street sidewalk). `sideZ` is which half of the main road it starts on (north/south),
+// `sideX` which side of the cross street (east/west), `idx` staggers multiple walkers on the same
+// sidewalk the way cars are staggered. A walker spawns out of view and walks toward the intersection.
+function routeFor(axis: "z" | "x", sideZ: 1 | -1, sideX: 1 | -1, idx: number): { legs: WalkerLeg[]; startPos: [number, number] } {
+  const turn = Math.random() < WALKER_TURN_CHANCE;
+
+  if (axis === "z") {
+    // ── Main-road walker: approaches along the main sidewalk (x = ±14), walking in z ──
+    const startZ = sideZ * (10 + idx * 20 + Math.random() * 5);
+    const fixedX = sideX * EW_CROSSWALK_X; // main sidewalk centerline == EW crosswalk centerline
+    const legs: WalkerLeg[] = [
+      // 1. Walk the main sidewalk down to the intersection curb.
+      { axis: "z", fixed: fixedX, start: startZ, target: sideZ * INTERSECTION_HALF, crosswalk: false },
+    ];
+    if (turn) {
+      // 2. Cross the cross street on the EW crosswalk, arriving at the far cross-street sidewalk.
+      legs.push({ axis: "z", fixed: fixedX, start: sideZ * INTERSECTION_HALF, target: -sideZ * CROSS_SIDEWALK_Z, crosswalk: true });
+      // 3. Walk that cross-street sidewalk outward to off-screen.
+      legs.push({ axis: "x", fixed: -sideZ * CROSS_SIDEWALK_Z, start: fixedX, target: sideX * (CROSS_SIDEWALK_FAR + WALKER_EXIT_MARGIN), crosswalk: false });
+    } else {
+      // 2. Keep going straight on the same sidewalk, past the intersection, to off-screen.
+      legs.push({ axis: "z", fixed: fixedX, start: sideZ * INTERSECTION_HALF, target: -sideZ * (WRAP_AT.z + WALKER_EXIT_MARGIN), crosswalk: false });
+    }
+    return { legs, startPos: [fixedX, startZ] };
+  }
+
+  // ── Cross-street walker: approaches along a cross-street sidewalk (z = ±8), walking in x ──
+  const startX = sideX * (20 + idx * 15 + Math.random() * 3);
+  const fixedZ = sideZ * CROSS_SIDEWALK_Z;
+  const cornerX = sideX * EW_CROSSWALK_X; // corner where the cross-street sidewalk meets the main sidewalk
+  const legs: WalkerLeg[] = [
+    // 1. Walk the cross-street sidewalk inward to the corner at x = ±14.
+    { axis: "x", fixed: fixedZ, start: startX, target: cornerX, crosswalk: false },
+  ];
+  if (turn) {
+    // 2. Move from the sidewalk (z = ±8) down to the EW crosswalk (z = ±4) on the corner.
+    legs.push({ axis: "z", fixed: cornerX, start: fixedZ, target: sideZ * INTERSECTION_HALF, crosswalk: false });
+    // 3. Cross the cross street on the EW crosswalk (z: ±4 -> ∓4).
+    legs.push({ axis: "z", fixed: cornerX, start: sideZ * INTERSECTION_HALF, target: -sideZ * INTERSECTION_HALF, crosswalk: true });
+    // 4. Continue along the main sidewalk, away from the intersection, to off-screen.
+    legs.push({ axis: "z", fixed: cornerX, start: -sideZ * INTERSECTION_HALF, target: -sideZ * (WRAP_AT.z + WALKER_EXIT_MARGIN), crosswalk: false });
+  } else {
+    // 2. Move from the sidewalk (z = ±8) down to the NS crosswalk (z = ±4) on the corner.
+    legs.push({ axis: "z", fixed: cornerX, start: fixedZ, target: sideZ * INTERSECTION_HALF, crosswalk: false });
+    // 3. Cross the main road on the NS crosswalk (x: ±14 -> ∓14) — the visible left/right crossing.
+    legs.push({ axis: "x", fixed: sideZ * INTERSECTION_HALF, start: cornerX, target: -cornerX, crosswalk: true });
+    // 4. Move back out from the crosswalk (z = ±4) to the far cross-street sidewalk (z = ±8).
+    legs.push({ axis: "z", fixed: -cornerX, start: sideZ * INTERSECTION_HALF, target: fixedZ, crosswalk: false });
+    // 5. Continue along the far cross-street sidewalk, outward to off-screen.
+    legs.push({ axis: "x", fixed: fixedZ, start: -cornerX, target: -sideX * (CROSS_SIDEWALK_FAR + WALKER_EXIT_MARGIN), crosswalk: false });
+  }
+  return { legs, startPos: [startX, fixedZ] };
+}
+
+function faceLeg(w: Walker, leg: WalkerLeg): void {
+  const dir = Math.sign(leg.target - leg.start) as 1 | -1;
+  w.grp.rotation.y = leg.axis === "z" ? (dir > 0 ? 0 : Math.PI) : (dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+}
+
+function assignRoute(w: Walker, axis: "z" | "x", sideZ: 1 | -1, sideX: 1 | -1, idx: number): void {
+  const { legs, startPos } = routeFor(axis, sideZ, sideX, idx);
+  w.legs = legs;
+  w.leg = 0;
+  w.grp.position.set(startPos[0], 0, startPos[1]);
+  const first = legs[0];
+  w.needsWalk = legNeedsWalk(first);
+  w.walking = !w.needsWalk; // sidewalk legs never wait; a crosswalk leg waits for its signal below
+  faceLeg(w, first);
+}
+
+function respawn(w: Walker): void {
+  const axis = Math.random() < 0.5 ? "z" : "x";
+  const sideZ = (Math.random() < 0.5 ? -1 : 1) as 1 | -1;
+  const sideX = (Math.random() < 0.5 ? -1 : 1) as 1 | -1;
+  const idx = Math.floor(Math.random() * (axis === "z" ? 4 : 2));
+  assignRoute(w, axis, sideZ, sideX, idx);
+}
+
+function advanceWalker(w: Walker): void {
+  w.leg++;
+  if (w.leg >= w.legs.length) {
+    respawn(w); // reached off-screen — start a fresh route on a fresh sidewalk
+    return;
+  }
+  const leg = w.legs[w.leg];
+  w.grp.position[otherAxis(leg.axis)] = leg.fixed; // snap to the new leg's centerline
+  w.needsWalk = legNeedsWalk(leg);
+  w.walking = !w.needsWalk;
+  faceLeg(w, leg);
+}
+
+function buildWalker(city: THREE.Group, axis: "z" | "x", sideZ: 1 | -1, sideX: 1 | -1, idx: number): Walker {
+  const w: Walker = {
+    grp: makePedestrian(city),
+    legs: [],
+    leg: 0,
+    sidewalkSpeed: WALKER_SIDEWALK_SPEED + Math.random() * 0.4,
+    crossSpeed: WALKER_CROSS_SPEED + Math.random() * 0.3,
+    needsWalk: null,
+    walking: false,
+  };
+  assignRoute(w, axis, sideZ, sideX, idx);
+  return w;
+}
+
+// Build a balanced set of walkers on both roads (so pedestrians are visible on both axes).
+function buildAxisWalkers(city: THREE.Group, axis: "z" | "x", count: number): Walker[] {
+  const walkers: Walker[] = [];
+  const perCombo = axis === "z" ? 4 : 2; // z uses idx 0..3 (spawn 10..90), x uses idx 0..1 (spawn 20..35)
+  const combos: [1 | -1, 1 | -1][] = [[-1, -1], [-1, 1], [1, -1], [1, 1]]; // [sideZ, sideX]
+  let c = 0;
+  let idx = 0;
+  for (let i = 0; i < count; i++) {
+    const [sideZ, sideX] = combos[c];
+    walkers.push(buildWalker(city, axis, sideZ, sideX, idx));
+    idx++;
+    if (idx >= perCombo) { idx = 0; c = (c + 1) % combos.length; }
+  }
+  return walkers;
+}
+
+export function buildWalkers(city: THREE.Group): Walker[] {
   return [
-    { grp: makePedestrian(city), axis: "x", fixed: -INTERSECTION_HALF, t: 0, dir: 1, moving: false },
-    { grp: makePedestrian(city), axis: "x", fixed: INTERSECTION_HALF, t: 1, dir: -1, moving: false },
-    { grp: makePedestrian(city), axis: "z", fixed: -EW_CROSSWALK_X, t: 0, dir: 1, moving: false },
-    { grp: makePedestrian(city), axis: "z", fixed: EW_CROSSWALK_X, t: 1, dir: -1, moving: false },
+    ...buildAxisWalkers(city, "z", WALKER_Z_COUNT),
+    ...buildAxisWalkers(city, "x", WALKER_X_COUNT),
   ];
 }
 
-export function updateCrossers(crossers: CityHandles["crossers"], phase: SignalPhase, dt: number): void {
-  for (const p of crossers) {
-    const walkable = p.axis === "x" ? phase.nsWalk : phase.ewWalk;
-    const remaining = p.axis === "x" ? phase.nsWalkRemaining : phase.ewWalkRemaining;
-    const span = p.axis === "x" ? NS_CROSSWALK_SPAN : EW_CROSSWALK_SPAN;
-    const speedFrac = p.axis === "x" ? PED_CROSS_SPEED_NS : PED_CROSS_SPEED_EW;
-    const crossingDuration = 1 / speedFrac;
-
-    // Pinned to the crosswalk while at the curb or crossing.
-    p.grp.position[otherAxis(p.axis)] = p.fixed;
-    p.grp.rotation.y = p.axis === "z" ? (p.dir > 0 ? 0 : Math.PI) : (p.dir > 0 ? Math.PI / 2 : -Math.PI / 2);
-
-    if (!p.moving && walkable && remaining >= crossingDuration + PED_DEPARTURE_MARGIN_S) {
-      p.moving = true; // enough of the walk window is left — safe to step off the curb
-    }
-    if (p.moving) {
-      p.t += p.dir * speedFrac * dt;
-      if (p.dir > 0 ? p.t >= 1 : p.t <= 0) {
-        p.t = p.dir > 0 ? 1 : 0;
-        p.moving = false; // arrived — wait at the far curb for the next walk window
-        p.dir = (p.dir * -1) as 1 | -1;
+export function updateWalkers(walkers: Walker[], phase: SignalPhase, dt: number): void {
+  for (const w of walkers) {
+    const leg = w.legs[w.leg];
+    if (!w.walking) {
+      // Waiting at a curb for the walk signal — step off once the window is long enough to finish.
+      const need = w.needsWalk;
+      if (need) {
+        const walkable = need === "ns" ? phase.nsWalk : phase.ewWalk;
+        const remaining = need === "ns" ? phase.nsWalkRemaining : phase.ewWalkRemaining;
+        const dur = Math.abs(leg.target - leg.start) / w.crossSpeed;
+        if (walkable && remaining >= dur + PED_DEPARTURE_MARGIN_S) w.walking = true;
+      } else {
+        w.walking = true;
       }
     }
-    p.grp.position[p.axis] = lerp(-span, span, p.t);
-  }
-}
+    if (!w.walking) continue;
 
-// ── Strollers (sidewalk ambience, never enter the road) ──
-// Strollers walk the full length of a sidewalk and wrap, exactly like cars do on their road. They
-// are confined to the sidewalk (their `across` coordinate is fixed on the sidewalk centerline), so
-// they never enter the road and can never collide with a car.
-const STROLLER_MARGIN = 5;
-const STROLLER_LANE_JITTER = SIDEWALK_WIDTH / 4;
-
-export function buildStrollers(city: THREE.Group): CityHandles["strollers"] {
-  const strollers: CityHandles["strollers"] = [];
-  const addStroller = (axis: Axis, along: number, across: number) => {
-    const dir = (Math.random() < 0.5 ? 1 : -1) as 1 | -1;
-    const grp = makePedestrian(city);
-    if (axis === "z") grp.position.set(across, 0, along);
-    else grp.position.set(along, 0, across);
-    grp.rotation.y = axis === "z" ? (dir > 0 ? 0 : Math.PI) : (dir > 0 ? Math.PI / 2 : -Math.PI / 2);
-    strollers.push({ grp, axis, dir, speed: 0.9 + Math.random() * 0.7 });
-  };
-  // Main-road sidewalks (at x = ±MAIN_SIDEWALK_X), walking along z.
-  for (let i = 0; i < 8; i++) {
-    const side = i % 2 === 0 ? -1 : 1;
-    const segSign = Math.random() < 0.5 ? 1 : -1;
-    const along = segSign * lerp(INTERSECTION_HALF, WRAP_AT.z - STROLLER_MARGIN, Math.random());
-    addStroller("z", along, side * MAIN_SIDEWALK_X + (Math.random() - 0.5) * STROLLER_LANE_JITTER);
-  }
-  // Cross-street sidewalks (at z = ±CROSS_SIDEWALK_Z), walking along x within one segment.
-  for (let i = 0; i < 4; i++) {
-    const side = i % 2 === 0 ? -1 : 1;
-    const segSign = Math.random() < 0.5 ? 1 : -1;
-    const along = segSign * lerp(MAIN_SIDEWALK_OUTER, CROSS_SIDEWALK_FAR - STROLLER_MARGIN, Math.random());
-    addStroller("x", along, side * CROSS_SIDEWALK_Z + (Math.random() - 0.5) * STROLLER_LANE_JITTER);
-  }
-  return strollers;
-}
-
-export function updateStrollers(strollers: CityHandles["strollers"], dt: number): void {
-  for (const p of strollers) {
-    p.grp.position[p.axis] += p.dir * p.speed * dt;
-    if (p.axis === "z") {
-      if (Math.abs(p.grp.position.z) > WRAP_AT.z) p.grp.position.z -= Math.sign(p.grp.position.z) * 2 * WRAP_AT.z;
+    const dir = Math.sign(leg.target - w.grp.position[leg.axis]) as 1 | -1;
+    const speed = leg.crosswalk ? w.crossSpeed : w.sidewalkSpeed;
+    const next = w.grp.position[leg.axis] + dir * speed * dt;
+    if ((leg.target - next) * dir <= 0) {
+      w.grp.position[leg.axis] = leg.target; // arrived
+      advanceWalker(w);
     } else {
-      // Cross-street sidewalks are two disconnected segments with the road in the gap between them.
-      // Confine each stroller to the segment it's already on: wrap within it, never across the gap.
-      const side = Math.sign(p.grp.position.x) || 1;
-      if (Math.abs(p.grp.position.x) > CROSS_SIDEWALK_FAR) p.grp.position.x = side * MAIN_SIDEWALK_OUTER;
-      else if (Math.abs(p.grp.position.x) < MAIN_SIDEWALK_OUTER) p.grp.position.x = side * CROSS_SIDEWALK_FAR;
+      w.grp.position[leg.axis] = next;
     }
   }
+}
+
+// Everything a car needs to know about walkers currently mid-crosswalk, so updateCars can stop for
+// them exactly as it used to stop for the old fixed crosswalk crossers.
+export function getCrossingPeds(walkers: Walker[]): { axis: "x" | "z"; fixed: number; moving: boolean }[] {
+  const out: { axis: "x" | "z"; fixed: number; moving: boolean }[] = [];
+  for (const w of walkers) {
+    const leg = w.legs[w.leg];
+    if (leg && leg.crosswalk) out.push({ axis: leg.axis, fixed: leg.fixed, moving: w.walking });
+  }
+  return out;
 }
