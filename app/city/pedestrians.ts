@@ -122,7 +122,7 @@ export function updateStrollers(strollers: CityHandles["strollers"], dt: number)
   for (const p of strollers) {
     p.grp.position[p.axis] += p.dir * p.speed * dt;
     if (p.axis === "z") {
-      if (Math.abs(p.grp.position.z) > WRAP_AT.z) p.grp.position.z = -p.grp.position.z;
+      if (Math.abs(p.grp.position.z) > WRAP_AT.z) p.grp.position.z -= Math.sign(p.grp.position.z) * 2 * WRAP_AT.z;
     } else {
       // Cross-street sidewalks are two disconnected segments with the road in the gap between them.
       // Confine each stroller to the segment it's already on: wrap within it, never across the gap.

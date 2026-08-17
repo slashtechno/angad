@@ -74,11 +74,13 @@ export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"
     const consider = (d: number) => { if (d < stopDist) stopDist = d; };
 
     // 1. Stop line — never enter the intersection on yellow or red. A car whose front bumper is
-    // already at/past the line (committed, entered on green) is allowed to finish its crossing.
+    // already past the line (committed, entered on green) is allowed to finish its crossing. A car
+    // whose front bumper is exactly at the line must also remain stopped, otherwise it would creep
+    // forward into the crosswalk / intersection the moment the clamp sets it on the line.
     const light = axis === "z" ? phase.nsLight : phase.ewLight;
     const stopLine = -dir * (axis === "z" ? STOP_OFFSET : EW_STOP_OFFSET);
     const distToLine = (stopLine - frontBumper) * dir;
-    if (light !== "green" && distToLine > 0) consider(distToLine);
+    if (light !== "green" && distToLine >= 0) consider(distToLine);
 
     // 2. Car ahead in the same lane — keep followGap (center-to-center) behind it.
     for (const other of cars) {
@@ -116,7 +118,9 @@ export function updateCars(cars: THREE.Group[], crossers: CityHandles["crossers"
     if (stopDist !== Infinity && stopDist > 0 && (pos + dir * stopDist - newPos) * dir < 0) {
       newPos = pos + dir * stopDist;
     }
-    if (Math.abs(newPos) > WRAP_AT[axis]) newPos = -newPos;
+    // Wrap around the loop. Use a true modulo offset rather than a sign flip so a car that overshoots
+    // the boundary doesn't end up outside the loop and oscillate back and forth across it.
+    if (Math.abs(newPos) > WRAP_AT[axis]) newPos -= Math.sign(newPos) * 2 * WRAP_AT[axis];
     car.position[axis] = newPos;
   }
 }
