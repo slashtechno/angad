@@ -10,6 +10,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import CityTheme from "./city/Theme";
+import GoatCounter from "./components/GoatCounter";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -59,9 +60,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <CityTheme>
-      <Outlet />
-    </CityTheme>
+    <>
+      <GoatCounter />
+      <CityTheme>
+        <Outlet />
+      </CityTheme>
+    </>
   );
 }
 
